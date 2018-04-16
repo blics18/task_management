@@ -1,0 +1,65 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: 100%;
+}
+
+/*---LOGIN/REGISTRATION----*/
+
+#loginRow{
+  padding: -50px;
+  height: 100vh;
+}
+.form{
+	padding: 20px;
+  text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#registration{
+  background: linear-gradient(to bottom right,#00b95a 0,#08b2e3);
+}
+
+.form input[type=email], input[type=password], input[type=text]{
+	color: black;
+	margin: 10px;
+	border: none;
+	border-bottom: 1px solid #333;
+	width: 50%;
+	font-size: 15px;
+  background-color: transparent;
+}
+
+.form input[type=email]:focus, input[type=password]:focus, input[type=text]:focus{
+	outline: none;
+  border-bottom: 3px solid #333;
+}
+
+.form button{
+  float: center;
+	margin-top: 10px;
+	width: 50%;
+	height: 40px;
+	border: 2px solid #0fb8ad;
+	color: #0fb8ad;
+	font-size: 15px;
+}
+
+.form button:hover{
+	background-color: #0fb8ad;
+	color: white;
+  border: 2px solid #1fc8db;
+}
+
+.form button:focus{
+	outline: none;
+}
+
+
+.auth-error-container{
+	color: red;
+	font-size: 1.4em;
+	padding-bottom: 5px;
+	/* display: none; */
+}
