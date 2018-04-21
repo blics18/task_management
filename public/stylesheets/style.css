@@ -91,3 +91,13 @@ h5{
   text-align: center;
   color: #17a2b8;
 }
+
+input[type=text]{
+  border-bottom: 1px solid #17a2b8;
+  width: 80%;
+}
+
+input[type=text]:focus{
+  border-bottom: 3px solid #17a2b8;
+  
+}

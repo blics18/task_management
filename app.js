@@ -9,6 +9,7 @@ var session = require('client-sessions');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var board = require('./routes/board');
 var auth = require('./routes/auth');
 var home = require('./routes/home');
 var userSession = require('./config');
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', users);
 app.use('/home', home);
 app.use('/auth', auth);
+app.use('/board', board);
 app.use('/', auth);
 
 // app.use(function(req, res, next) {
