@@ -4,12 +4,21 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('client-sessions');
+
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var auth = require('./routes/auth');
+var home = require('./routes/home');
+var userSession = require('./config');
+// var sequelize = require('./sequelize');
 
 var app = express();
+
+
+// client-sessions
+app.use(session(userSession));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,9 +34,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/users', users);
+app.use('/home', home);
 app.use('/auth', auth);
 app.use('/', auth);
 
+// app.use(function(req, res, next) {
+//   if (req.session && req.session.user) {
+//     userModel.findOne({ _id: req.session.user._id }, function(err, user) {
+//       if (user) {
+//         req.user = user.toObject();
+//         delete req.user.password; // delete the password from the session
+//         req.session.user = user;  //refresh the session value
+//         res.locals.user = user;
+//       }
+//       // finishing processing the middleware and run the route
+//       next();
+//     });
+//   } else {
+//     next();
+//   }
+// });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

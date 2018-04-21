@@ -3,6 +3,10 @@ body {
   height: 100%;
 }
 
+a{
+	text-decoration: none;
+}
+
 /*---LOGIN/REGISTRATION----*/
 
 #loginRow{
@@ -62,4 +66,28 @@ body {
 	font-size: 1.4em;
 	padding-bottom: 5px;
 	/* display: none; */
+}
+
+/*------ Home Page ------*/
+
+.navbar-dark .navbar-nav .nav-link{
+	color: #17a2b8;
+}
+
+.col-sm-3{
+  padding: 10px;
+}
+
+.card{
+  margin: 10px;
+  border-color: #17a2b8;
+}
+
+.card a{
+  text-decoration: none;
+}
+
+h5{
+  text-align: center;
+  color: #17a2b8;
 }
