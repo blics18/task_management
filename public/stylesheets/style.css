@@ -68,7 +68,7 @@ a{
 	/* display: none; */
 }
 
-/*------ Home Page ------*/
+/*------ HOME PAGE ------*/
 
 .navbar-dark .navbar-nav .nav-link{
 	color: #17a2b8;
@@ -92,6 +92,27 @@ h5{
   color: #17a2b8;
 }
 
+/*----- BOARD PAGE -------*/
+.cardTask{
+  text-align: left;
+}
+
+.list-group{
+  list-style-type: disc;
+}
+
+.deleteTask{
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+.categoryCard{
+  margin-left: 20px;
+}
 input[type=text]{
   border-bottom: 1px solid #17a2b8;
   width: 80%;
@@ -99,5 +120,10 @@ input[type=text]{
 
 input[type=text]:focus{
   border-bottom: 3px solid #17a2b8;
-  
+
+}
+
+.editCategoryButton, .deleteCategoryButton{
+  padding-top: 3px;
+  padding-bottom: 3px;
 }

@@ -24,6 +24,66 @@
   </nav>
 
   <div class="row">
+    <div class="card categoryCard" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title cardTask">Front-End
+          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
+            Edit
+          </button>
+          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
+            Delete
+          </button>
+        </h5>
+        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+        <li class="list-group-item">Dapibus ac facilisis in
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+        <li class="list-group-item">Vestibulum at eros
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="card categoryCard" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title cardTask">Front-End
+          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
+            Edit
+          </button>
+          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
+            Delete
+          </button>
+        </h5>
+        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+        <li class="list-group-item">Dapibus ac facilisis in
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+        <li class="list-group-item">Vestibulum at eros
+          <button type="button" class="close deleteTask" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </li>
+      </ul>
+    </div>
     <div class="col-sm-3">
       <div class="card">
         <a href="#" data-toggle="modal" data-target="#addCategoryModal" class="card-body">
@@ -33,7 +93,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Add Category Modal -->
   <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -54,6 +114,81 @@
         <div class="modal-footer">
           <button id="btn-cancelAddCategoryPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
           <button id="btn-submitAddCategoryPage" type="button" class="btn btn-outline-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addTask-form">
+            <div class="addTaskPage">
+                <input class="title" type="text" name="title" placeholder="Task Description">
+            </div>
+          </form>
+
+        </div>
+        <div class="modal-footer">
+          <button id="btn-cancelAddTaskPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+          <button id="btn-submitAddTaskPage" type="button" class="btn btn-outline-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCategoryModalLabel">Edit Category Title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editCategory-form">
+            <div class="editCategoryPage">
+                <input class="title" type="text" name="title" placeholder="Front-End">
+            </div>
+          </form>
+
+        </div>
+        <div class="modal-footer">
+          <button id="btn-cancelAddTaskPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+          <button id="btn-submitAddTaskPage" type="button" class="btn btn-outline-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Category Modal -->
+  <div class="modal fade" id="deleteCategoryModal" tabindex="-1" role="dialog" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteCategoryModalLabel">Delete Category</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="deleteCategory-form">
+            <div class="deleteCategoryPage">
+                <p>Are you sure you want to delete this category? Deleting the category will delete all the tasks associated with it.</p>
+                <button id="btn-deleteCategoryPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
+            </div>
+          </form>
+
         </div>
       </div>
     </div>
