@@ -23,7 +23,7 @@
       </div>
   </nav>
 
-  <div class="row">
+  <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title cardTask">Front-End
@@ -36,24 +36,26 @@
         </h5>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+      <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
+        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item">Dapibus ac facilisis in
+        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item">Vestibulum at eros
+        <li class="list-group-item ui-state-default">Vestibulum at eros
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
       </ul>
     </div>
+  </div>
+  <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title cardTask">Front-End
@@ -66,31 +68,31 @@
         </h5>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+      <ul id="sortable1" class="list-group list-group-flush connectedSortable">
+        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item">Dapibus ac facilisis in
+        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item">Vestibulum at eros
+        <li class="list-group-item ui-state-default">Vestibulum at eros
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
       </ul>
     </div>
-    <div class="col-sm-3">
-      <div class="card">
+  </div>
+  <div class="column">
+      <div class="card" style="width: 18rem;">
         <a href="#" data-toggle="modal" data-target="#addCategoryModal" class="card-body">
           <h5 class="card-title">Add Category</h5>
         </a>
       </div>
-    </div>
   </div>
 
   <!-- Add Category Modal -->
@@ -194,4 +196,11 @@
     </div>
   </div>
 
+<script>
+  $(document).ready(function(){
+     $( "#sortable1, #sortable2" ).sortable({
+       connectWith: ".connectedSortable"
+     }).disableSelection();
+  });
+</script>
 <%include footer %>

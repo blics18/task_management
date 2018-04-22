@@ -1,6 +1,7 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   height: 100%;
+  min-width: 520px;
 }
 
 a{
@@ -110,9 +111,6 @@ h5{
   font-size: 1.2em;
 }
 
-.categoryCard{
-  margin-left: 20px;
-}
 input[type=text]{
   border-bottom: 1px solid #17a2b8;
   width: 80%;
@@ -126,4 +124,9 @@ input[type=text]:focus{
 .editCategoryButton, .deleteCategoryButton{
   padding-top: 3px;
   padding-bottom: 3px;
+}
+
+.column {
+    float: left;
+    padding-bottom: 100px;
 }
