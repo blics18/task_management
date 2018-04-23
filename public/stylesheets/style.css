@@ -92,6 +92,20 @@ h5{
   text-align: center;
   color: #17a2b8;
 }
+.editBoardButtons{
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+.editBoardButton, .deleteBoardButton{
+    padding-left: 6px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    padding-right: 6px;
+
+}
 
 /*----- BOARD PAGE -------*/
 .cardTask{
