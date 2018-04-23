@@ -1,6 +1,7 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   height: 100%;
+  min-width: 520px;
 }
 
 a{
@@ -68,7 +69,7 @@ a{
 	/* display: none; */
 }
 
-/*------ Home Page ------*/
+/*------ HOME PAGE ------*/
 
 .navbar-dark .navbar-nav .nav-link{
 	color: #17a2b8;
@@ -90,4 +91,42 @@ a{
 h5{
   text-align: center;
   color: #17a2b8;
+}
+
+/*----- BOARD PAGE -------*/
+.cardTask{
+  text-align: left;
+}
+
+.list-group{
+  list-style-type: disc;
+}
+
+.deleteTask{
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+input[type=text]{
+  border-bottom: 1px solid #17a2b8;
+  width: 80%;
+}
+
+input[type=text]:focus{
+  border-bottom: 3px solid #17a2b8;
+
+}
+
+.editCategoryButton, .deleteCategoryButton{
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.column {
+    float: left;
+    padding-bottom: 100px;
 }
