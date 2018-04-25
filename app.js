@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('client-sessions');
+var db = require('./models/index');
 
 
 var index = require('./routes/index');
@@ -13,7 +14,6 @@ var board = require('./routes/board');
 var auth = require('./routes/auth');
 var home = require('./routes/home');
 var userSession = require('./config');
-// var sequelize = require('./sequelize');
 
 var app = express();
 
@@ -56,6 +56,23 @@ app.use('/', auth);
 //     next();
 //   }
 // });
+
+app.use(function(req, res, next){
+  if (req.session && req.session.user){
+    db.sequelize.query('SELECT * FROM "taskUsers" WHERE id= :id', {replacements: {id: req.session.user.id}, type: db.sequelize.QueryTypes.SELECT})
+    .then(function(user){
+      if (user){
+        req.user = user.toObject();
+        delete req.user.password;
+        req.session.user = user;
+        res.locals.user = user;
+      }
+      next();
+    });
+  }else{
+    next();
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
