@@ -58,7 +58,7 @@ app.use('/auth', auth);
 app.use('/users', users);
 app.use('/home', home);
 app.use('/board', board);
-app.use('/', auth);
+app.use('/', index);
 
 
 
