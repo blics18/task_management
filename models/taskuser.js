@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   taskUser.associate = function(models) {
     // associations can be defined here
+    taskUser.hasMany(models.board);
   };
   return taskUser;
 };

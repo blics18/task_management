@@ -13,7 +13,7 @@ var users = require('./routes/users');
 var board = require('./routes/board');
 var auth = require('./routes/auth');
 var home = require('./routes/home');
-var userSession = require('./config');
+var userSession = require('./cookieConfig');
 
 var app = express();
 
@@ -33,46 +33,34 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-app.use('/users', users);
-app.use('/home', home);
-app.use('/auth', auth);
-app.use('/board', board);
-app.use('/', auth);
-
-// app.use(function(req, res, next) {
-//   if (req.session && req.session.user) {
-//     userModel.findOne({ _id: req.session.user._id }, function(err, user) {
-//       if (user) {
-//         req.user = user.toObject();
-//         delete req.user.password; // delete the password from the session
-//         req.session.user = user;  //refresh the session value
-//         res.locals.user = user;
-//       }
-//       // finishing processing the middleware and run the route
-//       next();
-//     });
-//   } else {
-//     next();
-//   }
-// });
-
 app.use(function(req, res, next){
   if (req.session && req.session.user){
     db.sequelize.query('SELECT * FROM "taskUsers" WHERE id= :id', {replacements: {id: req.session.user.id}, type: db.sequelize.QueryTypes.SELECT})
-    .then(function(user){
-      if (user){
-        req.user = user.toObject();
+    .then(user => {
+      if (user.length != 0){
+        req.user = user[0];
         delete req.user.password;
-        req.session.user = user;
-        res.locals.user = user;
+        req.session.user = user[0];
+        res.locals.user = user[0];
       }
       next();
+    })
+    .catch(err =>{
+      res.status(500).send(err);
+      return console.error(err);
     });
   }else{
     next();
   }
 });
+
+app.use('/auth', auth);
+app.use('/users', users);
+app.use('/home', home);
+app.use('/board', board);
+app.use('/', auth);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

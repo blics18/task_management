@@ -58,7 +58,9 @@
         <div class="modal-body">
           <form id="addBoardTitle-form">
             <div class="addBoardPage">
-								<input class="title" type="text" name="title" placeholder="Board Title">
+              <div class="addBoardModal-error-container">
+              </div>
+								<input class="title" type="text" name="boardTitle" placeholder="Board Title">
 						</div>
           </form>
 
@@ -120,10 +122,32 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
   <script>
   	$(document).ready(function(){
+      $('#btn-submitAddBoardPage').on('click', function(event){
+        $.ajax({
+          type: "POST",
+          url: "/home/addBoard",
+          data: $('#addBoardTitle-form').serialize(),
+          dataType: "json",
+        })
+        .done(function(json){
+          if (json.err){
+            $('.addBoardModal-error-container').html(json.err);
+            $('.addBoardModal-error-container').css("display", "block");
+          }else{
+            $('.row').prepend(`<div class="col-sm-3"><div class="card"><a href="#" class="card-body"><h5 class="card-title"> ${json.boardName}</h5></a><div class="editBoardButtons"><button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="editBoardModal" data-board-id="${json.boardId}">Edit\
+            </button><button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button></div></div></div>`);
 
-
+            //add new board with title
+            $('#addBoardModal').modal('hide');
+            $('#addBoardTitle-form')[0].reset();
+          }
+        })
+        event.preventDefault();
+      });
     });
   </script>
-<%include footer %>
+<% include footer %>
