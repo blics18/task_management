@@ -56,6 +56,19 @@ router.post('/addBoard', function(req, res){
     res.status(500).send(err);
     return console.error(err);
   })
-})
+});
+
+router.delete('/deleteBoard/:boardId', function(req, res){
+  db.sequelize.query('DELETE FROM boards WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.DELETE})
+  .then(function(result){
+    res.end();
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  });
+
+});
+
 
 module.exports = router;

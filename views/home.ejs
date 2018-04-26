@@ -20,7 +20,7 @@
         </div>
     </nav>
 
-    <div class="row">
+    <div class="row" id="target-row">
       <% for (var i = 0; i < boards.length; i++){ %>
         <div class="col-sm-3">
           <div class="card">
@@ -115,7 +115,7 @@
           <form id="deleteBoard-form">
             <div class="deleteBoardPage">
                 <p>Are you sure you want to delete this board? Deleting the board will delete all the tasks associated with it.</p>
-                <button id="btn-deleteBoardPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
+                <button id="btn-deleteBoard" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
             </div>
           </form>
 
@@ -149,6 +149,21 @@
           }
         })
         event.preventDefault();
+      });
+
+      $('#target-row').on('click', '.deleteBoardButton', function(event){
+          var button = $(this);
+          var boardId = button.attr('data-board-id');
+          $('#btn-deleteBoard').on('click', function(event){
+            $.ajax({
+              type: "DELETE",
+              url: `/home/deleteBoard/${boardId}`
+            })
+            .done(function(response){
+              button.parent().parent().parent().remove();
+            })
+          });
+
       });
     });
   </script>
