@@ -6,7 +6,18 @@ var router = express.Router();
 router.use(auth.requireLogin);
 
 router.get('/', function(req, res, next){
-  res.render('home');
+  //load users boards
+  db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid', {replacements: {userid: req.user.id}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(boards){
+    res.render('home', {
+      boards: boards
+    });
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  });
+
 });
 
 //add new board title into database
