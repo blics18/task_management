@@ -1,5 +1,6 @@
 var express = require('express');
 var auth = require('../utils/requireLogin');
+var dup = require('../utils/duplicateBoard');
 var db = require('../models/index');
 var router = express.Router();
 
@@ -69,6 +70,42 @@ router.delete('/deleteBoard/:boardId', function(req, res){
   });
 
 });
+
+//update board title
+router.put('/updateBoard/:boardId', function(req, res){
+  db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    if (result.length == 0){ //no duplicate board name for one user
+      db.sequelize.query('UPDATE boards SET "boardName"=:boardName WHERE "boardId"=:boardId', {replacements: {boardName: req.body.boardTitle, boardId: req.params.boardId}, type: db.sequelize.QueryTypes.UPDATE})
+      .then(function(result){
+        if (result[1]){
+          db.sequelize.query('SELECT * FROM boards WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
+          .then(function(newTitle){
+            res.send(JSON.stringify(newTitle[0]));
+          })
+          .catch(function(err){
+            res.status(500).send(err);
+            return console.error(err);
+          })
+        }
+      })
+      .catch(function(err){
+        res.status(500).send(err);
+        return console.error(err);
+      })
+    }else{
+      err = {
+        err: `Board Name (${req.body.boardTitle.trim()}) already exists. Enter another`
+      }
+      res.send(JSON.stringify(err));
+    }
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
+});
+
 
 
 module.exports = router;

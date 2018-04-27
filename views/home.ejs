@@ -25,10 +25,10 @@
         <div class="col-sm-3">
           <div class="card">
             <a href="#" class="card-body">
-              <h5 class="card-title"><%= boards[i].boardName %></h5>
+              <h5 id="<%=boards[i].boardId %>" class="card-title"><%= boards[i].boardName %></h5>
             </a>
             <div class="editBoardButtons">
-            <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="<%= boards[i].boardId %>">
+            <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="<%= boards[i].boardId %>" data-board-name="<%= boards[i].boardName %>">
               Edit
             </button>
             <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="<%= boards[i].boardId %>">
@@ -86,9 +86,11 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="editBoard-form">
+          <form id="editBoardTitle-form">
             <div class="editBoardPage">
-                <input class="title" type="text" name="title" placeholder="Portal">
+              <div class="editBoardModal-error-container">
+              </div>
+              <input class="title" type="text" name="boardTitle">
             </div>
           </form>
 
@@ -147,7 +149,7 @@
             $('#addBoardModal').modal('hide');
             $('#addBoardTitle-form')[0].reset();
           }
-        })
+        });
         event.preventDefault();
       });
 
@@ -161,10 +163,36 @@
             })
             .done(function(response){
               button.parent().parent().parent().remove();
-            })
+            });
           });
-
       });
+
+      $('#target-row').on('click', '.editBoardButton', function(event){
+        var button = $(this);
+        var boardId = button.attr('data-board-id');
+        var boardName = button.attr('data-board-name');
+        $("#editBoardModal [name='boardTitle']").attr("value", boardName);
+        $('#btn-submitEditBoardPage').on('click', function(event){
+          $.ajax({
+            type: "PUT",
+            url: `/home/updateBoard/${boardId}`,
+            data: $('#editBoardTitle-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(response){
+            if (response.err){
+              $('.editBoardModal-error-container').html(response.err);
+              $('.editBoardModal-error-container').css("display", "block");
+            }else{
+              //edit board with new title
+              $(`#${response.boardId}`).replaceWith(`<h5 id="${response.boardId}" class="card-title"> ${response.boardName} </h5>`);
+
+              $('#editBoardModal').modal('hide');
+              $('#editBoardTitle-form')[0].reset();
+            }
+          })
+        })
+      })
     });
   </script>
 <% include footer %>
