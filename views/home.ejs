@@ -133,7 +133,7 @@
       $('#btn-submitAddBoardPage').on('click', function(event){
         $.ajax({
           type: "POST",
-          url: "/home/addBoard",
+          url: "/home/board/add",
           data: $('#addBoardTitle-form').serialize(),
           dataType: "json",
         })
@@ -159,7 +159,7 @@
           $('#btn-deleteBoard').on('click', function(event){
             $.ajax({
               type: "DELETE",
-              url: `/home/deleteBoard/${boardId}`
+              url: `/home/board/${boardId}/delete`
             })
             .done(function(response){
               button.parent().parent().parent().remove();
@@ -175,7 +175,7 @@
         $('#btn-submitEditBoardPage').on('click', function(event){
           $.ajax({
             type: "PUT",
-            url: `/home/updateBoard/${boardId}`,
+            url: `/home/board/${boardId}/update`,
             data: $('#editBoardTitle-form').serialize(),
             dataType: "json",
           })
