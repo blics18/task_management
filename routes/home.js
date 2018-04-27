@@ -1,6 +1,5 @@
 var express = require('express');
 var auth = require('../utils/requireLogin');
-var dup = require('../utils/duplicateBoard');
 var db = require('../models/index');
 var router = express.Router();
 
