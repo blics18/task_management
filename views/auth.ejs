@@ -4,6 +4,11 @@
 	     <div class="form">
     			<h1>Registration</h1>
     			<form action="/auth/register" method="POST">
+            <% if (typeof authRegError !== 'undefined'){ %>
+    					<div class="auth-error-container">
+    						<%= authRegError %>
+    					</div>
+    				<% } %>
             <input type="text" name="firstName" placeholder="First Name" required>
     				<br>
             <input type="text" name="lastName" placeholder="Last Name" required>
