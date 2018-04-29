@@ -91,6 +91,7 @@ a{
 h5{
   text-align: center;
   color: #17a2b8;
+  margin-top: 10px;
 }
 .editBoardButtons{
   position: absolute;
@@ -108,6 +109,15 @@ h5{
 }
 
 /*----- BOARD PAGE -------*/
+.navbar{
+    display: flex;
+}
+
+#target-body{
+  flex-grow: 1;
+  display: flex;
+}
+
 .cardTask{
   text-align: left;
 }

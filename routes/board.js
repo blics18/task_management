@@ -7,12 +7,22 @@ router.use(auth.requireLogin);
 
 
 router.get('/:boardName/board-id/:boardId', function(req, res, next) {
-  res.render('board', {
-    boardName: req.params.boardName,
-    boardId: req.params.boardId
-  });
+  //load user's categories
+  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(categories){
+    res.render('board', {
+      categories: categories,
+      boardName: req.params.boardName,
+      boardId: req.params.boardId
+    });
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
 });
 
+//add category
 router.post('/:boardId/category/add', function(req, res){
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
@@ -49,5 +59,17 @@ router.post('/:boardId/category/add', function(req, res){
     return console.error(err);
   })
 });
+
+//delete category
+router.delete('/:boardId/category/:categoryId/delete', function(req, res){
+  db.sequelize.query('DELETE FROM categories WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.DELETE})
+  .then(function(result){
+    res.end();
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  });
+})
 
 module.exports = router;
