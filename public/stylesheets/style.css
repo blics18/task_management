@@ -93,7 +93,7 @@ h5{
   color: #17a2b8;
   margin-top: 10px;
 }
-.editBoardButtons{
+.editBoardButtons, .editCategoryButtons{
   position: absolute;
   top: 0;
   right: 0;
@@ -109,9 +109,6 @@ h5{
 }
 
 /*----- BOARD PAGE -------*/
-.navbar{
-    display: flex;
-}
 
 #target-body{
   flex-grow: 1;

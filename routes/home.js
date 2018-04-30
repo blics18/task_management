@@ -76,7 +76,7 @@ router.put('/board/:boardId/update', function(req, res){
   db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate board name for one user
-      db.sequelize.query('UPDATE boards SET "boardName"=:boardName WHERE "boardId"=:boardId', {replacements: {boardName: req.body.boardTitle, boardId: req.params.boardId}, type: db.sequelize.QueryTypes.UPDATE})
+      db.sequelize.query('UPDATE boards SET "boardName"=:boardName WHERE "boardId"=:boardId', {replacements: {boardName: req.body.boardTitle.trim(), boardId: req.params.boardId}, type: db.sequelize.QueryTypes.UPDATE})
       .then(function(result){
         if (result[1]){
           db.sequelize.query('SELECT * FROM boards WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
