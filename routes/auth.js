@@ -14,7 +14,7 @@ router.post('/register', function(req, res){
       db.sequelize.query('SELECT * FROM "taskUsers" WHERE email=:email', {replacements: {email: req.body.email.trim()}, type: db.sequelize.QueryTypes.SELECT})
       .then(sessionUser => {
         console.log("/register user ", sessionUser);
-        req.session.user = sessionUser;
+        req.session.user = sessionUser[0];
         res.status(200).redirect('/home');
       })
       .catch(function(err){
@@ -34,7 +34,7 @@ router.post('/login', function(req, res){
   .then(function(user){
     if (user.length != 0){
       console.log("/login User ", user);
-      req.session.user = user;
+      req.session.user = user[0];
       res.status(200).redirect('/home');
     }else{
       res.render('auth', {authError: 'Incorrect Username or Password'});

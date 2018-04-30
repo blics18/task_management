@@ -14,28 +14,30 @@
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/auth">Logout</a>
+                    <a class="nav-link" href="/logout">Logout</a>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <div class="row">
-      <div class="col-sm-3">
-        <div class="card">
-          <a href="#" class="card-body">
-            <h5 class="card-title">The Portal</h5>
-          </a>
-          <div class="editBoardButtons">
-          <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal">
-            Edit
-          </button>
-          <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal">
-            Delete
-          </button>
+    <div class="row" id="target-row">
+      <% for (var i = 0; i < boards.length; i++){ %>
+        <div class="col-sm-3">
+          <div class="card">
+            <a href="#" class="card-body">
+              <h5 id="<%=boards[i].boardId %>" class="card-title"><%= boards[i].boardName %></h5>
+            </a>
+            <div class="editBoardButtons">
+            <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="<%= boards[i].boardId %>" data-board-name="<%= boards[i].boardName %>">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="<%= boards[i].boardId %>">
+              Delete
+            </button>
+          </div>
+          </div>
         </div>
-        </div>
-      </div>
+      <% } %>
       <div class="col-sm-3">
         <div class="card">
           <a href="#" data-toggle="modal" data-target="#addBoardModal" class="card-body">
@@ -58,7 +60,9 @@
         <div class="modal-body">
           <form id="addBoardTitle-form">
             <div class="addBoardPage">
-								<input class="title" type="text" name="title" placeholder="Board Title">
+              <div class="addBoardModal-error-container">
+              </div>
+								<input class="title" type="text" name="boardTitle" placeholder="Board Title">
 						</div>
           </form>
 
@@ -82,9 +86,11 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="editBoard-form">
+          <form id="editBoardTitle-form">
             <div class="editBoardPage">
-                <input class="title" type="text" name="title" placeholder="Portal">
+              <div class="editBoardModal-error-container">
+              </div>
+              <input class="title" type="text" name="boardTitle">
             </div>
           </form>
 
@@ -111,7 +117,7 @@
           <form id="deleteBoard-form">
             <div class="deleteBoardPage">
                 <p>Are you sure you want to delete this board? Deleting the board will delete all the tasks associated with it.</p>
-                <button id="btn-deleteBoardPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
+                <button id="btn-deleteBoard" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
             </div>
           </form>
 
@@ -120,10 +126,82 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
   <script>
   	$(document).ready(function(){
+      $('#btn-submitAddBoardPage').on('click', function(event){
+        $.ajax({
+          type: "POST",
+          url: "/home/board",
+          data: $('#addBoardTitle-form').serialize(),
+          dataType: "json",
+        })
+        .done(function(json){
+          if (json.err){
+            $('.addBoardModal-error-container').html(json.err);
+            $('.addBoardModal-error-container').css("display", "block");
+          }else{
+            $('.row').prepend(`<div class="col-sm-3">
+            <div class="card">
+              <a href="#" class="card-body">
+                <h5 id="${json.boardId}" class="card-title"> ${json.boardName}</h5>
+              </a>
+              <div class="editBoardButtons">
+                <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${json.boardId}" data-board-name="${json.boardName}">Edit</button>
+                <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button>
+              </div>
+              </div>
+            </div>`);
 
+            //add new board with title
+            $('#addBoardModal').modal('hide');
+            $('#addBoardTitle-form')[0].reset();
+          }
+        });
+        event.preventDefault();
+      });
 
+      $('#target-row').on('click', '.deleteBoardButton', function(event){
+          var button = $(this);
+          var boardId = button.attr('data-board-id');
+          $('#btn-deleteBoard').on('click', function(event){
+            $.ajax({
+              type: "DELETE",
+              url: `/home/board/${boardId}`
+            })
+            .done(function(response){
+              button.parent().parent().parent().remove();
+            });
+          });
+      });
+
+      $('#target-row').on('click', '.editBoardButton', function(event){
+        var button = $(this);
+        var boardId = button.attr('data-board-id');
+        var boardName = button.attr('data-board-name');
+        $("#editBoardModal [name='boardTitle']").attr("value", boardName);
+        $('#btn-submitEditBoardPage').on('click', function(event){
+          $.ajax({
+            type: "PUT",
+            url: `/home/board/${boardId}`,
+            data: $('#editBoardTitle-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(response){
+            if (response.err){
+              $('.editBoardModal-error-container').html(response.err);
+              $('.editBoardModal-error-container').css("display", "block");
+            }else{
+              //edit board with new title
+              $(`#${response.boardId}`).replaceWith(`<h5 id="${response.boardId}" class="card-title"> ${response.boardName} </h5>`);
+
+              $('#editBoardModal').modal('hide');
+              $('#editBoardTitle-form')[0].reset();
+            }
+          })
+        })
+      })
     });
   </script>
-<%include footer %>
+<% include footer %>
