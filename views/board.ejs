@@ -245,7 +245,7 @@
        var boardId = button.attr('data-board-id');
        $.ajax({
          type: "POST",
-         url: `/board/${boardId}/category/add`,
+         url: `/board/${boardId}/category`,
          data: $('#addCategoryTitle-form').serialize(),
          dataType: "json",
        })
@@ -290,7 +290,7 @@
      $('#btn-deleteCategory').on('click', function(event){
        $.ajax({
          type: "DELETE",
-         url: `/board/${boardId}/category/${categoryId}/delete`
+         url: `/board/${boardId}/category/${categoryId}`
        })
        .done(function(response){
          button.parent().parent().parent().parent().remove();
@@ -300,7 +300,7 @@
     $('#btn-submitEditCategoryPage').on('click', function(event){
          $.ajax({
            type: "PUT",
-           url: `/board/${boardId}/category/${categoryId}/update`,
+           url: `/board/${boardId}/category/${categoryId}`,
            data: $('#editCategoryTitle-form').serialize(),
            dataType: "json",
          })

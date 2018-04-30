@@ -23,7 +23,7 @@ router.get('/:boardName/board-id/:boardId', function(req, res, next) {
 });
 
 //add category
-router.post('/:boardId/category/add', function(req, res){
+router.post('/:boardId/category', function(req, res){
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate category name in a board
@@ -61,7 +61,7 @@ router.post('/:boardId/category/add', function(req, res){
 });
 
 //delete category
-router.delete('/:boardId/category/:categoryId/delete', function(req, res){
+router.delete('/:boardId/category/:categoryId', function(req, res){
   db.sequelize.query('DELETE FROM categories WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.DELETE})
   .then(function(result){
     res.end();
@@ -73,7 +73,7 @@ router.delete('/:boardId/category/:categoryId/delete', function(req, res){
 });
 
 //update category title
-router.put('/:boardId/category/:categoryId/update', function(req, res){
+router.put('/:boardId/category/:categoryId', function(req, res){
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     console.log("RESULT ", result);
