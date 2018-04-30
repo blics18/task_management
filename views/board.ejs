@@ -231,6 +231,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function(){
+    var categoryId;
+    var categoryName;
+    var boardId;
+    var button;
+
      $( "#sortable1, #sortable2" ).sortable({
        connectWith: ".connectedSortable"
      }).disableSelection();
@@ -255,7 +260,7 @@
                <div class="card-body">
                  <h5 id="${json.categoryId}" class="card-title cardTask">${json.categoryName}</h5>
                   <div class="editBoardButtons">
-                   <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${json.categoryId}" data-category-name="${json.categoryName}" data-board-id="${json.boardId}">
+                   <button id="editButton${json.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${json.categoryId}" data-category-name="${json.categoryName}" data-board-id="${json.boardId}">
                      Edit
                    </button>
                    <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal" data-category-id="${json.categoryId}" data-board-id="${json.boardId}">
@@ -277,34 +282,22 @@
      });
 
      $('#target-body').on('click', '.deleteCategoryButton', function(event){
-       var button = $(this);
-       var categoryId = button.attr('data-category-id');
-       var boardId = button.attr('data-board-id');
-       $('#btn-deleteCategory').on('click', function(event){
-         $.ajax({
-           type: "DELETE",
-           url: `/board/${boardId}/category/${categoryId}/delete`
-         })
-         .done(function(response){
-           button.parent().parent().parent().parent().remove();
-         });
+       button = $(this);
+       categoryId = button.attr('data-category-id');
+       boardId = button.attr('data-board-id');
+     });
+
+     $('#btn-deleteCategory').on('click', function(event){
+       $.ajax({
+         type: "DELETE",
+         url: `/board/${boardId}/category/${categoryId}/delete`
+       })
+       .done(function(response){
+         button.parent().parent().parent().parent().remove();
        });
      });
 
-     //TODO
-     // ***ERROR issue with editing; sometimes changes more than 1 title***
-     $('#target-body').on('click', '.editCategoryButton', function(event){
-       console.log(event);
-       var button = $(this);
-       var categoryId = button.attr('data-category-id');
-       var categoryName = button.attr('data-category-name');
-       var boardId = button.attr('data-board-id');
-       console.log("CATEGORY ID ", categoryId);
-       console.log("CATEGORY NAME ", categoryName);
-       $('.editCategoryModal-error-container').css("display", "none");
-       $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
-       $('#btn-submitEditCategoryPage').on('click', function(event){
-         console.log("EVENT ", event);
+    $('#btn-submitEditCategoryPage').on('click', function(event){
          $.ajax({
            type: "PUT",
            url: `/board/${boardId}/category/${categoryId}/update`,
@@ -319,8 +312,8 @@
            }else{
              //edit category with new title
             $(`#${response.categoryId}`).replaceWith(`<h5 id="${response.categoryId}" class="card-title cardTask">${response.categoryName}</h5>`);
-            $(`#editButton${response.categoryId}`).replaceWith(`<button id="editButton${response.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${response.categoryId}" data-category-name="${response.categoryName}" data-board-id="${response.boardId}">\
-              Edit\
+            $(`#editButton${response.categoryId}`).replaceWith(`<button id="editButton${response.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${response.categoryId}" data-category-name="${response.categoryName}" data-board-id="${response.boardId}">
+              Edit
             </button>`);
 
              $('#editCategoryModal').modal('hide');
@@ -329,7 +322,18 @@
          });
          event.preventDefault();
        });
-     });
+
+       $('#target-body').on('click', '.editCategoryButton', function(event){
+         var button = $(this);
+         categoryId = button.attr('data-category-id');
+         categoryName = button.attr('data-category-name');
+         boardId = button.attr('data-board-id');
+         console.log("CATEGORY ID ", categoryId);
+         console.log("CATEGORY NAME ", categoryName);
+         $('.editCategoryModal-error-container').css("display", "none");
+         $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
+       });
+
   });
 </script>
 <%include footer %>
