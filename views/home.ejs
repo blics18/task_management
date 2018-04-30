@@ -133,7 +133,7 @@
       $('#btn-submitAddBoardPage').on('click', function(event){
         $.ajax({
           type: "POST",
-          url: "/home/board/add",
+          url: "/home/board",
           data: $('#addBoardTitle-form').serialize(),
           dataType: "json",
         })
@@ -142,8 +142,17 @@
             $('.addBoardModal-error-container').html(json.err);
             $('.addBoardModal-error-container').css("display", "block");
           }else{
-            $('.row').prepend(`<div class="col-sm-3"><div class="card"><a href="#" class="card-body"><h5 class="card-title"> ${json.boardName}</h5></a><div class="editBoardButtons"><button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="editBoardModal" data-board-id="${json.boardId}">Edit\
-            </button><button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button></div></div></div>`);
+            $('.row').prepend(`<div class="col-sm-3">
+            <div class="card">
+              <a href="#" class="card-body">
+                <h5 id="${json.boardId}" class="card-title"> ${json.boardName}</h5>
+              </a>
+              <div class="editBoardButtons">
+                <button type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${json.boardId}" data-board-name="${json.boardName}">Edit</button>
+                <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button>
+              </div>
+              </div>
+            </div>`);
 
             //add new board with title
             $('#addBoardModal').modal('hide');
@@ -159,7 +168,7 @@
           $('#btn-deleteBoard').on('click', function(event){
             $.ajax({
               type: "DELETE",
-              url: `/home/board/${boardId}/delete`
+              url: `/home/board/${boardId}`
             })
             .done(function(response){
               button.parent().parent().parent().remove();
@@ -175,7 +184,7 @@
         $('#btn-submitEditBoardPage').on('click', function(event){
           $.ajax({
             type: "PUT",
-            url: `/home/board/${boardId}/update`,
+            url: `/home/board/${boardId}`,
             data: $('#editBoardTitle-form').serialize(),
             dataType: "json",
           })

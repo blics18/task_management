@@ -21,7 +21,7 @@ router.get('/', function(req, res, next){
 });
 
 //add new board title into database
-router.post('/board/add', function(req, res){
+router.post('/board', function(req, res){
   db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate board name for one user
@@ -59,7 +59,7 @@ router.post('/board/add', function(req, res){
 });
 
 //delete board
-router.delete('/board/:boardId/delete', function(req, res){
+router.delete('/board/:boardId', function(req, res){
   db.sequelize.query('DELETE FROM boards WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.DELETE})
   .then(function(result){
     res.end();
@@ -72,7 +72,7 @@ router.delete('/board/:boardId/delete', function(req, res){
 });
 
 //update board title
-router.put('/board/:boardId/update', function(req, res){
+router.put('/board/:boardId', function(req, res){
   db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate board name for one user
