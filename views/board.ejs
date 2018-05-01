@@ -1,13 +1,14 @@
 <% include header %>
 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
           <ul class="navbar-nav mr-auto">
               <li class="nav-item">
                   <a class="nav-link" href="/home">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Portal</a>
+                <a class="nav-link" href="#"><%= boardName %></a>
               </li>
           </ul>
       </div>
@@ -17,23 +18,45 @@
       <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
           <ul class="navbar-nav ml-auto">
               <li class="nav-item">
-                  <a class="nav-link" href="#">Logout</a>
+                  <a class="nav-link" href="/logout">Logout</a>
               </li>
           </ul>
       </div>
   </nav>
 
+<div id="target-body">
+  <% for (var i = 0; i < categories.length; i++){ %>
+    <div class="column">
+      <div class="card categoryCard" style="width: 18rem;">
+        <div class="card-body">
+          <h5 id="<%= categories[i].categoryId %>" class="card-title cardTask"><%= categories[i].categoryName %></h5>
+            <div class="editCategoryButtons">
+            <button id="editButton<%= categories[i].categoryId %>" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="<%= categories[i].categoryId %>" data-category-name="<%= categories[i].categoryName %>" data-board-id="<%=boardId%>">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal" data-category-id="<%= categories[i].categoryId %>" data-board-id="<%= boardId %>">
+              Delete
+            </button>
+          </div>
+          <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+        </div>
+        <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
+        </ul>
+      </div>
+    </div>
+  <% } %>
   <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title cardTask">Front-End
+        <h5 class="card-title cardTask">Front-End</h5>
+          <div class="editBoardButtons">
           <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
             Edit
           </button>
           <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
             Delete
           </button>
-        </h5>
+        </div>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
       <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
@@ -58,14 +81,15 @@
   <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title cardTask">Front-End
+        <h5 class="card-title cardTask">Front-End</h5>
+          <div class="editBoardButtons">
           <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
             Edit
           </button>
           <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
             Delete
           </button>
-        </h5>
+          </div>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
       <ul id="sortable1" class="list-group list-group-flush connectedSortable">
@@ -87,6 +111,7 @@
       </ul>
     </div>
   </div>
+
   <div class="column">
       <div class="card" style="width: 18rem;">
         <a href="#" data-toggle="modal" data-target="#addCategoryModal" class="card-body">
@@ -94,6 +119,7 @@
         </a>
       </div>
   </div>
+</div>
 
   <!-- Add Category Modal -->
   <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
@@ -108,14 +134,16 @@
         <div class="modal-body">
           <form id="addCategoryTitle-form">
             <div class="addCategoryPage">
-                <input class="title" type="text" name="title" placeholder="Category Title">
+              <div class="addCategoryModal-error-container">
+              </div>
+              <input class="title" type="text" name="categoryTitle" placeholder="Category Title">
             </div>
           </form>
 
         </div>
         <div class="modal-footer">
           <button id="btn-cancelAddCategoryPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
-          <button id="btn-submitAddCategoryPage" type="button" class="btn btn-outline-success">Submit</button>
+          <button id="btn-submitAddCategoryPage" type="button" class="btn btn-outline-success" data-board-id="<%=boardId%>">Submit</button>
         </div>
       </div>
     </div>
@@ -158,9 +186,11 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="editCategory-form">
+          <form id="editCategoryTitle-form">
             <div class="editCategoryPage">
-                <input class="title" type="text" name="title" placeholder="Front-End">
+              <div class="editCategoryModal-error-container">
+              </div>
+                <input class="title" type="text" name="categoryTitle">
             </div>
           </form>
 
@@ -187,7 +217,7 @@
           <form id="deleteCategory-form">
             <div class="deleteCategoryPage">
                 <p>Are you sure you want to delete this category? Deleting the category will delete all the tasks associated with it.</p>
-                <button id="btn-deleteCategoryPage" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
+                <button id="btn-deleteCategory" type="button" class="btn btn-outline-danger" data-dismiss="modal">Delete</button>
             </div>
           </form>
 
@@ -196,11 +226,114 @@
     </div>
   </div>
 
+  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function(){
+    var categoryId;
+    var categoryName;
+    var boardId;
+    var button;
+
      $( "#sortable1, #sortable2" ).sortable({
        connectWith: ".connectedSortable"
      }).disableSelection();
+
+     $('#btn-submitAddCategoryPage').on('click', function(event){
+       var button = $(this);
+       var boardId = button.attr('data-board-id');
+       $.ajax({
+         type: "POST",
+         url: `/board/${boardId}/category`,
+         data: $('#addCategoryTitle-form').serialize(),
+         dataType: "json",
+       })
+       .done(function(json){
+         if (json.err){
+           $('.addCategoryModal-error-container').html(json.err);
+           $('.addCategoryModal-error-container').css("display", "block");
+         }else{
+           //add new category with title
+           $('#target-body').prepend(`<div class="column">
+             <div class="card categoryCard" style="width: 18rem;">
+               <div class="card-body">
+                 <h5 id="${json.categoryId}" class="card-title cardTask">${json.categoryName}</h5>
+                  <div class="editBoardButtons">
+                   <button id="editButton${json.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${json.categoryId}" data-category-name="${json.categoryName}" data-board-id="${json.boardId}">
+                     Edit
+                   </button>
+                   <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal" data-category-id="${json.categoryId}" data-board-id="${json.boardId}">
+                     Delete
+                   </button>
+                 </div>
+                 <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+               </div>
+               <ul  id="${json.categoryName}" class="list-group list-group-flush connectedSortable">
+               </ul>
+             </div>
+           </div>`);
+
+           $('#addCategoryModal').modal('hide');
+           $('#addCategoryTitle-form')[0].reset();
+         }
+       });
+       event.preventDefault();
+     });
+
+     $('#target-body').on('click', '.deleteCategoryButton', function(event){
+       button = $(this);
+       categoryId = button.attr('data-category-id');
+       boardId = button.attr('data-board-id');
+     });
+
+     $('#btn-deleteCategory').on('click', function(event){
+       $.ajax({
+         type: "DELETE",
+         url: `/board/${boardId}/category/${categoryId}`
+       })
+       .done(function(response){
+         button.parent().parent().parent().parent().remove();
+       });
+     });
+
+    $('#btn-submitEditCategoryPage').on('click', function(event){
+         $.ajax({
+           type: "PUT",
+           url: `/board/${boardId}/category/${categoryId}`,
+           data: $('#editCategoryTitle-form').serialize(),
+           dataType: "json",
+         })
+         .done(function(response){
+           console.log("RESPONSE ", response);
+           if (response.err){
+             $('.editCategoryModal-error-container').html(response.err);
+             $('.editCategoryModal-error-container').css("display", "block");
+           }else{
+             //edit category with new title
+            $(`#${response.categoryId}`).replaceWith(`<h5 id="${response.categoryId}" class="card-title cardTask">${response.categoryName}</h5>`);
+            $(`#editButton${response.categoryId}`).replaceWith(`<button id="editButton${response.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${response.categoryId}" data-category-name="${response.categoryName}" data-board-id="${response.boardId}">
+              Edit
+            </button>`);
+
+             $('#editCategoryModal').modal('hide');
+             $('#editCategoryTitle-form')[0].reset();
+           }
+         });
+         event.preventDefault();
+       });
+
+       $('#target-body').on('click', '.editCategoryButton', function(event){
+         var button = $(this);
+         categoryId = button.attr('data-category-id');
+         categoryName = button.attr('data-category-name');
+         boardId = button.attr('data-board-id');
+         console.log("CATEGORY ID ", categoryId);
+         console.log("CATEGORY NAME ", categoryName);
+         $('.editCategoryModal-error-container').css("display", "none");
+         $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
+       });
+
   });
 </script>
 <%include footer %>

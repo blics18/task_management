@@ -24,7 +24,7 @@
       <% for (var i = 0; i < boards.length; i++){ %>
         <div class="col-sm-3">
           <div class="card">
-            <a href="#" class="card-body">
+            <a href="/board/<%=boards[i].boardName%>/board-id/<%=boards[i].boardId%>" class="card-body">
               <h5 id="<%=boards[i].boardId %>" class="card-title"><%= boards[i].boardName %></h5>
             </a>
             <div class="editBoardButtons">
