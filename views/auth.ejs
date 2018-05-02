@@ -3,12 +3,9 @@
     <div class="col-sm-6" id="registration">
 	     <div class="form">
     			<h1>Registration</h1>
-    			<form action="/auth/register" method="POST">
-            <% if (typeof authRegError !== 'undefined'){ %>
-    					<div class="auth-error-container">
-    						<%= authRegError %>
+    			<form id="addNewUser-form">
+    					<div class="register-error-container">
     					</div>
-    				<% } %>
             <input type="text" name="firstName" placeholder="First Name" required>
     				<br>
             <input type="text" name="lastName" placeholder="Last Name" required>
@@ -17,7 +14,7 @@
     				<br>
     				<input type="password" name="password" placeholder="Password" required>
     				<br>
-    				<button type="submit">Register</button>
+    				<button id="btn-submitRegister" type="submit">Register</button>
     			</form>
 		    </div>
     </div>
@@ -25,19 +22,58 @@
     <div class="col-sm-6">
   		<div class="form">
   			<h1>Login</h1>
-  			<form action="/auth/login" method="POST">
-  				<% if (typeof authError !== 'undefined'){ %>
-  					<div class="auth-error-container">
-  						<%= authError %>
+  			<form id="loginUser-form">
+  					<div class="login-error-container">
   					</div>
-  				<% } %>
   				<input type="email" name="email" placeholder="Email" required>
   				<br>
   				<input type="password" name="password" placeholder="Password" required>
   				<br>
-  				<button type="submit">Login</button>
+  				<button id="btn-submitLogin" type="submit">Login</button>
   			</form>
   		</div>
     </div>
   </div>
+
+  <script>
+  $(document).ready(function(){
+      $('#btn-submitRegister').on('click', function(event){
+        $.ajax({
+          type: "POST",
+          url: '/auth/register',
+          data: $('#addNewUser-form').serialize(),
+          dataType: "json",
+        })
+        .done(function(json){
+          if (json.err){
+            console.log("HERE ", json.err);
+            $('.register-error-container').html(json.err);
+            $('.register-error-container').css("display", "block");
+          }else{
+            window.location.href = json.redirect;
+          }
+        });
+        event.preventDefault();
+      });
+
+      $('#btn-submitLogin').on('click', function(event){
+        $.ajax({
+          type: "POST",
+          url: '/auth/login',
+          data: $('#loginUser-form').serialize(),
+          dataType: "json",
+        })
+        .done(function(json){
+          if (json.err){
+            $('.login-error-container').html(json.err);
+            $('.login-error-container').css("display", "block");
+          }else{
+            window.location.href = json.redirect;
+          }
+        });
+        event.preventDefault();
+      });
+
+  });
+  </script>
 <% include footer %>

@@ -15,7 +15,8 @@ router.post('/register', function(req, res){
       .then(sessionUser => {
         console.log("/register user ", sessionUser);
         req.session.user = sessionUser[0];
-        res.status(200).redirect('/home');
+        // res.status(200).redirect('/home');
+        return res.send({ redirect: '/home' });
       })
       .catch(function(err){
         res.status(500).send(err);
@@ -24,8 +25,9 @@ router.post('/register', function(req, res){
     }
   })
   .catch(function(err){
-    res.status(500).render('auth', {authRegError: 'Email already in use'});
-    return console.error(err);
+    // res.status(500).render('auth', {authRegError: 'Email already in use'});
+    res.send({ err: 'Email already in use'});
+    console.error(err);
   });
 });
 
@@ -35,9 +37,11 @@ router.post('/login', function(req, res){
     if (user.length != 0){
       console.log("/login User ", user);
       req.session.user = user[0];
-      res.status(200).redirect('/home');
+      // res.status(200).redirect('/home');
+      res.send({ redirect: '/home' });
     }else{
-      res.render('auth', {authError: 'Incorrect Username or Password'});
+      // res.render('auth', {authError: 'Incorrect Username or Password'});
+      res.send({err: 'Incorrect Username or Password'});
     }
   })
   .catch(function(err){
