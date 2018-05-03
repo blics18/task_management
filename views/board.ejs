@@ -59,18 +59,18 @@
         </div>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
-      <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
-        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+      <ul  id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Front-End">
+        <li id="1" class="list-group-item ui-state-default" data-category-name="Front-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
+        <li id="2" class="list-group-item ui-state-default" data-category-name="Front-End">Dapibus ac facilisis in
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item ui-state-default">Vestibulum at eros
+        <li id="3" class="list-group-item ui-state-default" data-category-name="Front-End">Vestibulum at eros
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
@@ -81,7 +81,7 @@
   <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title cardTask">Front-End</h5>
+        <h5 class="card-title cardTask">Back-End</h5>
           <div class="editBoardButtons">
           <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
             Edit
@@ -92,18 +92,18 @@
           </div>
         <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
       </div>
-      <ul id="sortable1" class="list-group list-group-flush connectedSortable">
-        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
+      <ul id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Back-End">
+        <li id="1" class="list-group-item ui-state-default" data-category-name="Back-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
+        <li id="2" class="list-group-item ui-state-default" data-category-name="Back-End">Dapibus ac facilisis in
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
         </li>
-        <li class="list-group-item ui-state-default">Vestibulum at eros
+        <li id="3" class="list-group-item ui-state-default" data-category-name="Back-End">Vestibulum at eros
           <button type="button" class="close deleteTask" aria-label="Close">
             <span>&times;</span>
           </button>
@@ -237,7 +237,12 @@
     var button;
 
      $( "#sortable1, #sortable2" ).sortable({
-       connectWith: ".connectedSortable"
+       connectWith: ".connectedSortable",
+       update: function( event, ui ) {
+         console.log($(this).attr('data-category-name'));
+         var result = $(this).sortable('toArray');
+         console.log(result);
+       }
      }).disableSelection();
 
      $('#btn-submitAddCategoryPage').on('click', function(event){

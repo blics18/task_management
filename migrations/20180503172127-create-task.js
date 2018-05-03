@@ -1,31 +1,31 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('categories', {
-      categoryId: {
+    return queryInterface.createTable('tasks', {
+      taskId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      categoryName: {
+      taskName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      //foreignKey
-      boardId:{
+      //foreign key
+      categoryId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'boards',
-          key: 'boardId'
+          model: 'categories',
+          key: 'categoryId'
         },
         onUpdate: 'cascade',
         onDelete: 'cascade'
-      }
+      },
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('categories');
+    return queryInterface.dropTable('tasks');
   }
 };
