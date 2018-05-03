@@ -30,18 +30,22 @@ router.post('/board', function(req, res){
         if (boardResult[1]){
           db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(board){
-            res.send(JSON.stringify(board[0]));
+            res.status(200).send(JSON.stringify(board[0]));
+            // res.send({boardName: board[0].boardName, boardId: board[0].boardId, userId: board[0].userId });
           })
           .catch(function(err){
+            console.log("HERE1");
             res.status(500).send(err);
             return console.error(err);
           })
         }else{
+          console.log("HERE2");
           res.status(500).send(err);
           return console.error(err);
         }
       })
       .catch(function(err){
+        console.log("HERE3");
         res.status(500).send(err);
         return console.error(err);
       })
@@ -53,6 +57,7 @@ router.post('/board', function(req, res){
     }
   })
   .catch(function(err){
+    console.log("HERE4");
     res.status(500).send(err);
     return console.error(err);
   })

@@ -23,6 +23,7 @@ it('should successfully login and redirect to home page', function(done) {
       response.body.should.be.a('object');
       response.body.should.have.property('redirect');
       response.body.redirect.should.equal('/home');
+      expect('Location', '/home');
       done();
     });
 });
