@@ -76,7 +76,6 @@ router.delete('/:boardId/category/:categoryId', function(req, res){
 router.put('/:boardId/category/:categoryId', function(req, res){
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
-    console.log("RESULT ", result);
     if (result.length == 0){ //no duplicate category name for one user
       db.sequelize.query('UPDATE categories SET "categoryName"=:categoryName WHERE "categoryId"=:categoryId', {replacements: {categoryName: req.body.categoryTitle.trim(), categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.UPDATE})
       .then(function(updateResult){
@@ -102,6 +101,35 @@ router.put('/:boardId/category/:categoryId', function(req, res){
         err: `Category Name (${req.body.categoryTitle.trim()}) already exists. Enter another`
       }
       res.send(JSON.stringify(err));
+    }
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
+});
+
+router.put('/:boardId/category/:categoryId/task', function(req, res){
+  db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"= :taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    if (result.length == 0){ //no duplicate task for one user
+      db.sequelize.query('INSERT INTO tasks ("taskName", "categoryId") VALUES (:taskName, :categoryId)', {replacements: {taskName: req.body.taskDescription.trim(), categoryId: req.params.categoryId }, type: db.sequelize.QueryTypes.INSERT})
+      .then(function(taskResult){
+        db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"= :taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
+        .then(function(task){
+          res.json(task[0]);
+        })
+        .catch(function(err){
+          res.status(500).send(err);
+          return console.error(err);
+        });
+      })
+      .catch(function(err){
+        res.status(500).send(err);
+        return console.error(err);
+      })
+    }else{
+      res.json({ err: `Task (${req.body.taskDescription.trim()}) already exists. Enter another`});
     }
   })
   .catch(function(err){

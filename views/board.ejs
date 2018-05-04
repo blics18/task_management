@@ -38,9 +38,9 @@
               Delete
             </button>
           </div>
-          <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+          <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
-        <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
+        <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable">
         </ul>
       </div>
     </div>
@@ -57,7 +57,7 @@
             Delete
           </button>
         </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text addTaskButton">+ Add New Tasks</a>
       </div>
       <ul  id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Front-End">
         <li id="1" class="list-group-item ui-state-default" data-category-name="Front-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
@@ -90,7 +90,7 @@
             Delete
           </button>
           </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text addTaskButton">+ Add New Tasks</a>
       </div>
       <ul id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Back-End">
         <li id="1" class="list-group-item ui-state-default" data-category-name="Back-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
@@ -162,7 +162,9 @@
         <div class="modal-body">
           <form id="addTask-form">
             <div class="addTaskPage">
-                <input class="title" type="text" name="title" placeholder="Task Description">
+              <div class="addTaskModal-error-container">
+              </div>
+                <input class="title" type="text" name="taskDescription" placeholder="Task Description">
             </div>
           </form>
 
@@ -245,6 +247,38 @@
        }
      }).disableSelection();
 
+     $('#target-body').on('click', '.addTaskButton', function(event){
+       button = $(this);
+       categoryId = button.attr('data-category-id');
+       boardId = button.attr('data-board-id');
+     });
+
+     $('#btn-submitAddTaskPage').on('click', function(event){
+       $.ajax({
+         type: "PUT",
+         url: `/board/${boardId}/category/${categoryId}/task`,
+         data: $('#addTask-form').serialize(),
+         dataType: "json",
+       })
+       .done(function(json){
+         if (json.err){
+           $('.addTaskModal-error-container').html(json.err);
+           $('.addTaskModal-error-container').css("display", "block");
+         }else{
+           //add task into list
+           $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">
+           ${json.taskName}
+             <button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}">
+               <span>&times;</span>
+             </button>
+           </li>`);
+
+           $('#addTaskModal').modal('hide');
+           $('#addTask-form')[0].reset();
+         }
+       })
+     });
+
      $('#btn-submitAddCategoryPage').on('click', function(event){
        var button = $(this);
        var boardId = button.attr('data-board-id');
@@ -272,9 +306,9 @@
                      Delete
                    </button>
                  </div>
-                 <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+                 <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="${json.boardId}" data-category-id="${json.categoryId}" class="card-text addTaskButton">+ Add New Tasks</a>
                </div>
-               <ul  id="${json.categoryName}" class="list-group list-group-flush connectedSortable">
+               <ul  id="sortable${json.categoryId}" class="list-group list-group-flush connectedSortable">
                </ul>
              </div>
            </div>`);
