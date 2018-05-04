@@ -279,6 +279,18 @@
        })
      });
 
+     $('#target-body').on('click', '.deleteTask', function(event){
+       button = $(this);
+       taskId = button.attr('data-task-id');
+       $.ajax({
+         type: "DELETE",
+         url: `/board/${boardId}/category/${categoryId}/task/${taskId}`
+       })
+       .done(function(response){
+         button.parent().remove();
+       })
+     });
+
      $('#btn-submitAddCategoryPage').on('click', function(event){
        var button = $(this);
        var boardId = button.attr('data-board-id');
@@ -344,7 +356,6 @@
            dataType: "json",
          })
          .done(function(response){
-           console.log("RESPONSE ", response);
            if (response.err){
              $('.editCategoryModal-error-container').html(response.err);
              $('.editCategoryModal-error-container').css("display", "block");
@@ -367,8 +378,6 @@
          categoryId = button.attr('data-category-id');
          categoryName = button.attr('data-category-name');
          boardId = button.attr('data-board-id');
-         console.log("CATEGORY ID ", categoryId);
-         console.log("CATEGORY NAME ", categoryName);
          $('.editCategoryModal-error-container').css("display", "none");
          $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
        });

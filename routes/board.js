@@ -109,6 +109,7 @@ router.put('/:boardId/category/:categoryId', function(req, res){
   })
 });
 
+//add task to a category
 router.put('/:boardId/category/:categoryId/task', function(req, res){
   db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"= :taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
@@ -136,5 +137,17 @@ router.put('/:boardId/category/:categoryId/task', function(req, res){
     res.status(500).send(err);
     return console.error(err);
   })
+});
+
+//delete task from category
+router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
+  db.sequelize.query('DELETE FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: req.params.taskId}, type: db.sequelize.QueryTypes.DELETE})
+  .then(function(result){
+    res.end();
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  });
 })
 module.exports = router;
