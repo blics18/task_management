@@ -238,6 +238,7 @@
     var boardId;
     var button;
 
+    //sortable[taskId]
      $( "#sortable1, #sortable2" ).sortable({
        connectWith: ".connectedSortable",
        update: function( event, ui ) {
@@ -255,7 +256,7 @@
 
      $('#btn-submitAddTaskPage').on('click', function(event){
        $.ajax({
-         type: "PUT",
+         type: "POST",
          url: `/board/${boardId}/category/${categoryId}/task`,
          data: $('#addTask-form').serialize(),
          dataType: "json",
@@ -275,9 +276,36 @@
 
            $('#addTaskModal').modal('hide');
            $('#addTask-form')[0].reset();
+           updateOrder(json.categoryId);
+           createSortable(json.categoryId);
          }
        })
      });
+
+     function createSortable(categoryId){
+       $(`#sortable${categoryId}`).sortable({
+         connectWith: ".connectedSortable",
+         update: function( event, ui ) {
+           var taskArray = $(this).sortable('toArray');
+           console.log("sortable ", taskArray);
+         }
+       });
+     };
+
+     function updateOrder(categoryId){
+       var taskArray = [];
+       $(`#sortable${categoryId}>li`).each(function(){
+         taskArray.push(parseInt($(this).attr('id')));
+       });
+       $.ajax({
+         type: "POST",
+         url: `/board/${boardId}/category/${categoryId}/task/order`,
+         data: {array: taskArray}
+       })
+       .done(function(result){
+
+       })
+     };
 
      $('#target-body').on('click', '.deleteTask', function(event){
        button = $(this);

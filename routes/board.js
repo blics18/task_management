@@ -110,7 +110,7 @@ router.put('/:boardId/category/:categoryId', function(req, res){
 });
 
 //add task to a category
-router.put('/:boardId/category/:categoryId/task', function(req, res){
+router.post('/:boardId/category/:categoryId/task', function(req, res){
   db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"= :taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate task for one user
@@ -149,5 +149,36 @@ router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
     res.status(500).send(err);
     return console.error(err);
   });
-})
+});
+
+//insert list of task ids to keep order
+router.post('/:boardId/category/:categoryId/task/order', function(req, res){
+  console.log("REQ BODY ", req.body.array);
+  db.sequelize.query('SELECT * FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    if (result.length == 0){
+      db.sequelize.query('INSERT INTO "taskOrders" ("categoryId", "taskArray") VALUES (:categoryId, :taskArray)', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.INSERT})
+      .then(function(arrayResult){
+        res.end();
+      })
+      .catch(function(err){
+        res.status(500).send(err);
+        return console.error(err);
+      })
+    }else{
+      db.sequelize.query('UPDATE "taskOrders" SET "taskArray"=:taskArray WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.UDPATE})
+      .then(function(arrayResult){
+        res.end();
+      })
+      .catch(function(err){
+        res.status(500).send(err);
+        return console.error(err);
+      });
+    }
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  });
+});
 module.exports = router;
