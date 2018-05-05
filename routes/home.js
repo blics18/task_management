@@ -30,7 +30,7 @@ router.post('/board', function(req, res){
         if (boardResult[1]){
           db.sequelize.query('SELECT * FROM boards WHERE "userId"=:userid AND "boardName"= :boardName', {replacements: {userid: req.user.id, boardName: req.body.boardTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(board){
-            res.send(JSON.stringify(board[0]));
+            res.json(board[0]);
           })
           .catch(function(err){
             res.status(500).send(err);
@@ -46,10 +46,7 @@ router.post('/board', function(req, res){
         return console.error(err);
       })
     }else{
-      err = {
-          err: `Board Name (${req.body.boardTitle.trim()}) already exists. Enter another`
-      }
-      res.send(JSON.stringify(err));
+      res.json({err: `Board Name (${req.body.boardTitle.trim()}) already exists. Enter another`});
     }
   })
   .catch(function(err){
@@ -81,7 +78,7 @@ router.put('/board/:boardId', function(req, res){
         if (result[1]){
           db.sequelize.query('SELECT * FROM boards WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(newTitle){
-            res.send(JSON.stringify(newTitle[0]));
+            res.json(newTitle[0]);
           })
           .catch(function(err){
             res.status(500).send(err);
@@ -94,10 +91,7 @@ router.put('/board/:boardId', function(req, res){
         return console.error(err);
       })
     }else{
-      err = {
-        err: `Board Name (${req.body.boardTitle.trim()}) already exists. Enter another`
-      }
-      res.send(JSON.stringify(err));
+      res.json({err: `Board Name (${req.body.boardTitle.trim()}) already exists. Enter another`});
     }
   })
   .catch(function(err){
