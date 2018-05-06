@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "mocha --exit"
+    "test": "mocha --exit",
+    "testcafe": "set NODE_ENV=test && testcafe chrome frontend-test/"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
-    "mocha": "^5.1.1"
+    "mocha": "^5.1.1",
+    "testcafe": "^0.19.2"
   }
 }
