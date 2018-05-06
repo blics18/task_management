@@ -153,11 +153,10 @@ router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
 
 //insert list of task ids to keep order
 router.post('/:boardId/category/:categoryId/task/order', function(req, res){
-  console.log("REQ BODY ", req.body.array);
   db.sequelize.query('SELECT * FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){
-      db.sequelize.query('INSERT INTO "taskOrders" ("categoryId", "taskArray") VALUES (:categoryId, :taskArray)', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.INSERT})
+      db.sequelize.query('INSERT INTO "taskOrders" ("categoryId", "taskArray") VALUES (:categoryId, ARRAY[:taskArray])', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array.map(Number)}, type: db.sequelize.QueryTypes.INSERT})
       .then(function(arrayResult){
         res.end();
       })
@@ -166,7 +165,7 @@ router.post('/:boardId/category/:categoryId/task/order', function(req, res){
         return console.error(err);
       })
     }else{
-      db.sequelize.query('UPDATE "taskOrders" SET "taskArray"=:taskArray WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.UDPATE})
+      db.sequelize.query('UPDATE "taskOrders" SET "taskArray"=ARRAY[:taskArray] WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array.map(Number)}, type: db.sequelize.QueryTypes.UDPATE})
       .then(function(arrayResult){
         res.end();
       })
