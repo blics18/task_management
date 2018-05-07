@@ -79,11 +79,9 @@ router.put('/:boardId/category/:categoryId', function(req, res){
     if (result.length == 0){ //no duplicate category name for one user
       db.sequelize.query('UPDATE categories SET "categoryName"=:categoryName WHERE "categoryId"=:categoryId', {replacements: {categoryName: req.body.categoryTitle.trim(), categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.UPDATE})
       .then(function(updateResult){
-        console.log("UPDATE RESULT ", updateResult);
         if (updateResult[1]){
           db.sequelize.query('SELECT * FROM categories WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(newTitle){
-            console.log("NEW TITLE ", newTitle);
             res.send(JSON.stringify(newTitle[0]));
           })
           .catch(function(err){
@@ -149,6 +147,18 @@ router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
     res.status(500).send(err);
     return console.error(err);
   });
+});
+
+//update categoryId for a task
+router.put('/:boardId/category/:categoryId/task/:taskId', function(req, res){
+  db.sequelize.query('UPDATE tasks SET "categoryId"=:categoryId WHERE "taskId"=:taskId', {replacements: {categoryId: req.params.categoryId, taskId: req.params.taskId}, type: db.sequelize.QueryTypes.UPDATE})
+  .then(function(result){
+    res.end();
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
 });
 
 //insert list of task ids to keep order

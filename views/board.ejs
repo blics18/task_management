@@ -40,7 +40,7 @@
           </div>
           <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
-        <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable">
+        <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable" data-category-id="<%= categories[i].categoryId %>">
         </ul>
       </div>
     </div>
@@ -228,7 +228,6 @@
     </div>
   </div>
 
-  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
@@ -239,14 +238,13 @@
     var button;
 
     //sortable[taskId]
-     $( "#sortable1, #sortable2" ).sortable({
-       connectWith: ".connectedSortable",
-       update: function( event, ui ) {
-         console.log($(this).attr('data-category-name'));
-         var result = $(this).sortable('toArray');
-         console.log(result);
-       }
-     }).disableSelection();
+     // $( "#sortable1, #sortable2" ).sortable({
+     //   connectWith: ".connectedSortable",
+     //   update: function( event, ui ) {
+     //     console.log($(this).attr('data-category-name'));
+     //     var result = $(this).sortable('toArray');
+     //   }
+     // }).disableSelection();
 
      $('#target-body').on('click', '.addTaskButton', function(event){
        button = $(this);
@@ -285,11 +283,29 @@
      function createSortable(categoryId){
        $(`#sortable${categoryId}`).sortable({
          connectWith: ".connectedSortable",
-         update: function( event, ui ) {
+         receive: function(event, ui){
            var taskArray = $(this).sortable('toArray');
-           console.log("sortable ", taskArray);
+           console.log("Receive sortable ", taskArray);
+           updateOrder(categoryId);
+           console.log(ui.item["0"].id);
+           updateTaskTable(categoryId, ui.item["0"].id);
+         },
+         remove: function(event, ui){
+           var taskArray = $(this).sortable('toArray');
+           console.log("Remove sortable ", taskArray);
+           updateOrder(categoryId);
          }
        });
+     };
+
+     function updateTaskTable(newCategoryId, taskId){
+       $.ajax({
+         type: "PUT",
+         url: `/board/${boardId}/category/${newCategoryId}/task/${taskId}`
+       })
+       .done(function(result){
+
+       })
      };
 
      function updateOrder(categoryId){
@@ -310,12 +326,14 @@
      $('#target-body').on('click', '.deleteTask', function(event){
        button = $(this);
        taskId = button.attr('data-task-id');
+       categoryId = button.parent().parent().attr('data-category-id');
        $.ajax({
          type: "DELETE",
          url: `/board/${boardId}/category/${categoryId}/task/${taskId}`
        })
        .done(function(response){
          button.parent().remove();
+         updateOrder(categoryId);
        })
      });
 
@@ -348,7 +366,7 @@
                  </div>
                  <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="${json.boardId}" data-category-id="${json.categoryId}" class="card-text addTaskButton">+ Add New Tasks</a>
                </div>
-               <ul  id="sortable${json.categoryId}" class="list-group list-group-flush connectedSortable">
+               <ul  id="sortable${json.categoryId}" class="list-group list-group-flush connectedSortable" data-category-id="${json.categoryId}">
                </ul>
              </div>
            </div>`);
@@ -401,14 +419,14 @@
          event.preventDefault();
        });
 
-       $('#target-body').on('click', '.editCategoryButton', function(event){
-         var button = $(this);
-         categoryId = button.attr('data-category-id');
-         categoryName = button.attr('data-category-name');
-         boardId = button.attr('data-board-id');
-         $('.editCategoryModal-error-container').css("display", "none");
-         $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
-       });
+     $('#target-body').on('click', '.editCategoryButton', function(event){
+       var button = $(this);
+       categoryId = button.attr('data-category-id');
+       categoryName = button.attr('data-category-name');
+       boardId = button.attr('data-board-id');
+       $('.editCategoryModal-error-container').css("display", "none");
+       $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
+     });
 
   });
 </script>
