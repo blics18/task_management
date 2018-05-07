@@ -3,7 +3,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('taskUsers', [{
-        id: 1,
         firstName: 'John',
         lastName: 'Doe',
         email: 'demo@demo.com',

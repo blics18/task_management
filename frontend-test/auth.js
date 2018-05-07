@@ -14,10 +14,24 @@ const loginEmailInput = Selector('#loginUser-form input[name="email"]');
 const loginPasswordInput = Selector('#loginUser-form input[name="password"]');
 const submitLoginButton = Selector('#btn-submitLogin');
 
-//TODO change to test database
+//test with duplicate email
+test('Register with existing email', async t => {
+  await t
+  .click(firstNameInput)
+  .typeText(firstNameInput, 'John')
+  .click(lastNameInput)
+  .typeText(lastNameInput, 'Doe')
+  .click(registrationEmailInput)
+  .typeText(registrationEmailInput, 'demo@demo.com')
+  .click(registrationPasswordInput)
+  .typeText(registrationPasswordInput, 'demo')
+  .click(submitRegisterButton)
 
+  .expect(Selector('.register-error-container').visible).ok()
+  .expect(Selector('.register-error-container').innerText).eql('Email already in use');
+});
 
-test('Register Correctly', async t => {
+test('Register correctly', async t => {
     await t
         .click(firstNameInput)
         .typeText(firstNameInput, 'John')
@@ -30,23 +44,8 @@ test('Register Correctly', async t => {
         .click(submitRegisterButton)
 
         //exepct to be on home page
+        .expect(Selector('.navbar-brand').exists).ok()
         .expect(Selector('.navbar-brand').innerText).eql('TM');
-});
-
-//test with duplicate email
-test('Register with existing email', async t => {
-  await t
-  .click(firstNameInput)
-  .typeText(firstNameInput, 'John')
-  .click(lastNameInput)
-  .typeText(lastNameInput, 'Smith')
-  .click(registrationEmailInput)
-  .typeText(registrationEmailInput, 'js@gmail.com')
-  .click(registrationPasswordInput)
-  .typeText(registrationPasswordInput, 'js')
-  .click(submitRegisterButton)
-
-  .expect(Selector('.register-error-container').innerText).eql('Email already in use');
 });
 
 //submit with missing first name
@@ -190,9 +189,9 @@ test('Register with password input as spaces', async t => {
 test('Login with registered user', async t => {
     await t
       .click(loginEmailInput)
-      .typeText(loginEmailInput, 'a@a.com') //demo@demo.com
+      .typeText(loginEmailInput, 'demo@demo.com')
       .click(loginPasswordInput)
-      .typeText(loginPasswordInput, 'a') //demo
+      .typeText(loginPasswordInput, 'demo')
       .click(submitLoginButton)
 
       //exepct to be on home page
@@ -203,9 +202,9 @@ test('Login with registered user', async t => {
 test('Login with email and password not matching', async t => {
     await t
       .click(loginEmailInput)
-      .typeText(loginEmailInput, 'a@a.com') //demo@demo.com
+      .typeText(loginEmailInput, 'demo@demo.com')
       .click(loginPasswordInput)
-      .typeText(loginPasswordInput, 'b') //demo
+      .typeText(loginPasswordInput, 'b')
       .click(submitLoginButton)
 
       .expect(Selector('.login-error-container').innerText).eql('Incorrect Username or Password');
@@ -215,7 +214,7 @@ test('Login with email and password not matching', async t => {
 test('Login with email missing', async t => {
     await t
       .click(loginPasswordInput)
-      .typeText(loginPasswordInput, 'a') //demo
+      .typeText(loginPasswordInput, 'demo')
       .click(submitLoginButton)
 
       .expect(Selector('#btn-submitLogin').exists).ok();
@@ -227,7 +226,7 @@ test('Login with email input as spaces', async t => {
       .click(loginEmailInput)
       .typeText(loginEmailInput, '     ')
       .click(loginPasswordInput)
-      .typeText(loginPasswordInput, 'a') //demo
+      .typeText(loginPasswordInput, 'demo')
       .click(submitLoginButton)
 
       .expect(Selector('#btn-submitLogin').exists).ok();
@@ -237,7 +236,7 @@ test('Login with email input as spaces', async t => {
 test('Login with password missing', async t => {
     await t
       .click(loginEmailInput)
-      .typeText(loginEmailInput, 'a@a.com')
+      .typeText(loginEmailInput, 'demo@demo.com')
       .click(submitLoginButton)
 
       .expect(Selector('#btn-submitLogin').exists).ok();
@@ -247,7 +246,7 @@ test('Login with password missing', async t => {
 test('Login with password input as spaces', async t => {
     await t
       .click(loginEmailInput)
-      .typeText(loginEmailInput, 'a@a.com')
+      .typeText(loginEmailInput, 'demo@demo.com')
       .click(loginPasswordInput)
       .typeText(loginPasswordInput, '      ')
       .click(submitLoginButton)

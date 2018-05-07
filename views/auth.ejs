@@ -56,7 +56,7 @@
       }
 
       $('#addNewUser-form').submit(function(event){
-        if (validateRegisterForm() == true){
+        if (validateRegisterForm()){
           $.ajax({
             type: "POST",
             url: '/auth/register',
