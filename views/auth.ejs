@@ -37,40 +37,67 @@
 
   <script>
   $(document).ready(function(){
-      $('#btn-submitRegister').on('click', function(event){
-        $.ajax({
-          type: "POST",
-          url: '/auth/register',
-          data: $('#addNewUser-form').serialize(),
-          dataType: "json",
-        })
-        .done(function(json){
-          if (json.err){
-            console.log("HERE ", json.err);
-            $('.register-error-container').html(json.err);
-            $('.register-error-container').css("display", "block");
-          }else{
-            window.location.href = json.redirect;
-          }
-        });
+      function validateRegisterForm(){
+        if ($.trim($('#addNewUser-form input[name="firstName"]').val()) == ""){
+          return false;
+        }else if ($.trim($('#addNewUser-form input[name="lastName"]').val()) == ""){
+          return false;
+        }else if ($.trim($('#addNewUser-form input[name="password"]').val()) == ""){
+          return false;
+        }
+        return true;
+      };
+
+      function validateLoginForm(){
+        if ($.trim($('#loginUser-form input[name="password"]').val()) == ""){
+          return false;
+        }
+        return true;
+      }
+
+      $('#addNewUser-form').submit(function(event){
+        if (validateRegisterForm()){
+          $.ajax({
+            type: "POST",
+            url: '/auth/register',
+            data: $('#addNewUser-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(json){
+            if (json.err){
+              $('.register-error-container').html(json.err);
+              $('.register-error-container').css("display", "block");
+            }else{
+              window.location.href = json.redirect;
+            }
+          });
+        }else{
+          $('.register-error-container').html("Please fill out everything");
+          $('.register-error-container').css("display", "block");
+        }
         event.preventDefault();
       });
 
-      $('#btn-submitLogin').on('click', function(event){
-        $.ajax({
-          type: "POST",
-          url: '/auth/login',
-          data: $('#loginUser-form').serialize(),
-          dataType: "json",
-        })
-        .done(function(json){
-          if (json.err){
-            $('.login-error-container').html(json.err);
-            $('.login-error-container').css("display", "block");
-          }else{
-            window.location.href = json.redirect;
-          }
-        });
+      $('#loginUser-form').submit(function(event){
+        if (validateLoginForm()){
+          $.ajax({
+            type: "POST",
+            url: '/auth/login',
+            data: $('#loginUser-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(json){
+            if (json.err){
+              $('.login-error-container').html(json.err);
+              $('.login-error-container').css("display", "block");
+            }else{
+              window.location.href = json.redirect;
+            }
+          });
+        }else{
+          $('.login-error-container').html("Please fill out everything");
+          $('.login-error-container').css("display", "block");
+        }
         event.preventDefault();
       });
 
