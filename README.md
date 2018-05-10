@@ -9,6 +9,11 @@ A version of a to do list where there will be boards and in each board there wil
 npm install
 ```
 # Features
+### Auth Page
+
+### Home Page
+
+### Board Page
 
 # Technologies
 
