@@ -8,7 +8,7 @@
                   <a class="nav-link" href="/home">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#"><%= boardName %></a>
+                <a class="nav-link boardId" href="#" data-board-id="<%=boardId %>"><%= boardName %></a>
               </li>
           </ul>
       </div>
@@ -41,11 +41,12 @@
           <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
         <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable" data-category-id="<%= categories[i].categoryId %>">
+            <i class="fa fa-spinner fa-spin" id="loadIcon<%=categories[i].categoryId %>"></i>
         </ul>
       </div>
     </div>
   <% } %>
-  <div class="column">
+  <!-- <div class="column">
     <div class="card categoryCard" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title cardTask">Front-End</h5>
@@ -110,7 +111,7 @@
         </li>
       </ul>
     </div>
-  </div>
+  </div> -->
 
   <div class="column">
       <div class="card" style="width: 18rem;">
@@ -234,8 +235,25 @@
   $(document).ready(function(){
     var categoryId;
     var categoryName;
-    var boardId;
+    var boardId = $('.boardId').attr('data-board-id');
     var button;
+
+    $.ajax({
+      type: "GET",
+      url: `/board/${boardId}/task/load`,
+      datatype: "json"
+    })
+    .done(function(json){
+      console.log(json);
+      // for (i = 0; i < json.length; i++){
+        //   $(`#loadIcon${categoryId}`).css('display', 'none');
+        // $(`#sortable${json[i].categoryId}`).prepend(`<li id="${json[i].taskId}" class="list-group-item ui-state-default" data-category-id="${json[i].categoryId}">
+        // ${json[i].taskName}
+        //   <button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json[i].taskId}">
+        //     <span>&times;</span>
+        //   </button>
+        // </li>`);
+    })
 
     //sortable[taskId]
      // $( "#sortable1, #sortable2" ).sortable({

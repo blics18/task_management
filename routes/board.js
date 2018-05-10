@@ -5,11 +5,13 @@ var router = express.Router();
 
 router.use(auth.requireLogin);
 
+var categoryId;
 
 router.get('/:boardName/board-id/:boardId', function(req, res, next) {
   //load user's categories
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(categories){
+    categoryId = categories;
     res.render('board', {
       categories: categories,
       boardName: req.params.boardName,
@@ -20,6 +22,101 @@ router.get('/:boardName/board-id/:boardId', function(req, res, next) {
     res.status(500).send(err);
     return console.error(err);
   })
+});
+
+//TODO ISSUE
+// function queryTask(taskArray, res){
+//   var tasks = [];
+//   for (i = 0; i < taskArray.length; i++){
+//       promise = new Promise((resolve, reject) => {
+//
+//       db.sequelize.query('SELECT * FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: taskArray[i]}, type: db.sequelize.QueryTypes.SELECT})
+//       .then(function(task){
+//         // tasks.push(task[0]);
+//         resolve(task[0]);
+//       })
+//       .catch(function(err){
+//         reject(err);
+//         res.status(500).send(err);
+//         return console.error(err);
+//       })
+//     })
+//     tasks.push(promise);
+//   }
+//
+//
+//     Promise.all(tasks).then(function(tasks){
+//       console.log("RESOLVE HERE ", tasks);
+//       return new Promise((resolve, reject) => {
+//         resolve(tasks);
+//     })
+//   })
+// }
+
+function queryTask(taskArray, res){
+  var tasks = [];
+
+  return new Promise((resolve, reject) => {
+    for (i = 0; i < taskArray.length; i++){
+      db.sequelize.query('SELECT * FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: taskArray[i]}, type: db.sequelize.QueryTypes.SELECT})
+      .then(function(task){
+        // tasks.push(task[0]);
+        resolve(task[0]);
+      })
+      .catch(function(err){
+        reject(err);
+        res.status(500).send(err);
+        return console.error(err);
+      })
+    }
+  })
+}
+
+//TODO ISSUE
+function queryTaskOrder(res){
+  var taskMap = new Map();
+  return new Promise((resolve, reject) => {
+    for (i = 0; i < categoryId.length; i++){
+      db.sequelize.query('SELECT "taskArray" FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: categoryId[i].categoryId}, type: db.sequelize.QueryTypes.SELECT})
+      .then(function(taskArray){
+        console.log("taskArray ------> ", taskArray);
+        const taskPromise = queryTask(taskArray[0].taskArray, res);
+        taskPromise.then(task =>{
+            // if (taskMap.get(task.categoryId)){
+            //   taskMap.get(task.categoryId).push(task.task);
+            //   console.log("TASKMAP HERE ----> ", taskMap);
+            // }else{
+            //   var tasks = [];
+            //   tasks.push(task);
+            //   taskMap.set(task.categoryId, tasks);
+            //   console.log("TASKMAP ----> ", taskMap);
+            // }
+            taskMap.set(task.categoryId, task);
+            console.log("TASKMAP ----> ", taskMap);
+        })
+        .catch(err =>{
+          console.log(err);
+        })
+      })
+      .catch(function(err){
+        reject(err);
+        res.status(500).send(err);
+        return console.error(err);
+      })
+    }
+    resolve(taskMap);
+  })
+}
+
+//TODO ISSUE
+router.get('/:boardId/task/load', function(req, res){
+    const taskOrderPromise = queryTaskOrder(res);
+    taskOrderPromise.then(taskMap =>{
+      res.json(taskMap);
+    })
+    .catch(err => {
+      console.log(err);
+    })
 });
 
 //add category
