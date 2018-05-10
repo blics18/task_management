@@ -8,6 +8,14 @@ A version of a to do list where there will be boards and in each board there wil
 ```
 npm install
 ```
+4. Open another terminal and type in psql -U postgres and enter password
+5. Create 2 databases used for this project by running the commands:
+```
+CREATE DATABASE "taskManagement";
+```
+```
+CREATE DATABASE "test";
+```
 # Features
 ### Auth Page
 
