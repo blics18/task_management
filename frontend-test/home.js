@@ -115,21 +115,21 @@ test('User cancels edit board name', async t => {
 test('User edits a board name', async t => {
     await t
       .expect(Selector('.navbar-brand').innerText).eql('TM')
-      .click(Selector('#editButton1'))
+      .click(Selector('#editButton2'))
       .expect(editBoardModal.visible).ok()
       .click(editBoardFormInput)
       .pressKey('ctrl+a delete')
       .typeText(editBoardFormInput, "Testing")
       .click(editBoardSubmitButton)
       .expect(editBoardModal.visible).notOk()
-      .expect(Selector('#board1').innerText).eql("Testing")
+      .expect(Selector('#board2').innerText).eql("Testing")
 });
 
 //user edits a board name (duplicate name error)
 test('User edits a board name but it already exists', async t => {
     await t
       .expect(Selector('.navbar-brand').innerText).eql('TM')
-      .click(Selector('#editButton1'))
+      .click(Selector('#editButton2'))
       .expect(editBoardModal.visible).ok()
       .click(editBoardFormInput)
       .pressKey('ctrl+a delete')
@@ -143,7 +143,7 @@ test('User edits a board name but it already exists', async t => {
 test('User edits board name with empty spaces', async t => {
     await t
       .expect(Selector('.navbar-brand').innerText).eql('TM')
-      .click(Selector('#editButton1'))
+      .click(Selector('#editButton2'))
       .expect(editBoardModal.visible).ok()
       .click(editBoardFormInput)
       .pressKey('ctrl+a delete')
@@ -157,11 +157,11 @@ test('User edits board name with empty spaces', async t => {
 test('User deletes a board', async t => {
     await t
       .expect(Selector('.navbar-brand').innerText).eql('TM')
-      .click(Selector('#deleteButton1'))
+      .click(Selector('#deleteButton2'))
       .expect(Selector('#deleteBoardModal').visible).ok()
       .click(Selector('#btn-deleteBoard'))
       .expect(Selector('#deleteBoardModal').visible).notOk()
-      .expect(Selector('deleteButton1').exists).notOk();
+      .expect(Selector('deleteButton2').exists).notOk();
 });
 
 //logout user
