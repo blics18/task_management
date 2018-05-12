@@ -8,7 +8,7 @@
                   <a id="home" class="nav-link" href="/home">Home</a>
               </li>
               <li class="nav-item">
-                <a id="boardPageName" class="nav-link" href="#"><%= boardName %></a>
+                <a id="boardPageName" class="nav-link boardId" href="#" data-board-id="<%=boardId %>"><%= boardName %></a>
               </li>
           </ul>
       </div>
@@ -38,79 +38,14 @@
               Delete
             </button>
           </div>
-          <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
+          <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
-        <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
+        <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable" data-category-id="<%= categories[i].categoryId %>">
+            <!-- <i class="fa fa-spinner fa-spin" id="loadIcon<%=categories[i].categoryId %>"></i> -->
         </ul>
       </div>
     </div>
   <% } %>
-  <div class="column">
-    <div class="card categoryCard" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title cardTask">Front-End</h5>
-          <div class="editBoardButtons">
-          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
-            Edit
-          </button>
-          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
-            Delete
-          </button>
-        </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
-      </div>
-      <ul  id="sortable1" class="list-group list-group-flush connectedSortable">
-        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li class="list-group-item ui-state-default">Vestibulum at eros
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="column">
-    <div class="card categoryCard" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title cardTask">Front-End</h5>
-          <div class="editBoardButtons">
-          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
-            Edit
-          </button>
-          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
-            Delete
-          </button>
-          </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
-      </div>
-      <ul id="sortable1" class="list-group list-group-flush connectedSortable">
-        <li class="list-group-item ui-state-default">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li class="list-group-item ui-state-default">Dapibus ac facilisis in
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li class="list-group-item ui-state-default">Vestibulum at eros
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
 
   <div class="column">
       <div class="card" style="width: 18rem;">
@@ -162,7 +97,9 @@
         <div class="modal-body">
           <form id="addTask-form">
             <div class="addTaskPage">
-                <input class="title" type="text" name="title" placeholder="Task Description">
+              <div class="addTaskModal-error-container">
+              </div>
+                <input class="title" type="text" name="taskDescription" placeholder="Task Description">
             </div>
           </form>
 
@@ -226,19 +163,152 @@
     </div>
   </div>
 
-  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function(){
     var categoryId;
     var categoryName;
-    var boardId;
+    var boardId = $('.boardId').attr('data-board-id');
     var button;
 
-     $( "#sortable1, #sortable2" ).sortable({
-       connectWith: ".connectedSortable"
-     }).disableSelection();
+    $.ajax({
+      type: "GET",
+      url: `/board/${boardId}/categories`,
+      dataType: "json"
+      })
+      .done(function(json){
+        for (i = 0;i < json.length; i++){
+          loadTasks(json[i].categoryId);
+        }
+      });
+
+    function getTaskId(categoryId, taskName){
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          type: "GET",
+          url: `/board/${boardId}/category/${categoryId}/task/${taskName}`,
+          dataType: "json"
+        })
+        .done(function(json){
+          resolve({taskId: json.taskId, taskName: json.taskName});
+        })
+        .error(function(err){
+          reject(err);
+        })
+    })
+  }
+
+    function loadTasks(categoryId){
+      $.ajax({
+        type: "GET",
+        url: `/board/${boardId}/category/${categoryId}/task/load`,
+        dataType: "json"
+      })
+      .done(function(json){
+        for (i = 0; i < json.taskArray.length; i++){
+          var taskIdPromise = getTaskId(json.categoryId, json.taskArray[i]);
+          taskIdPromise.then(result => {
+            console.log("TASK ", result);
+              // $(`#loadIcon${categoryId}`).css('display', 'none');
+            $(`#sortable${json.categoryId}`).prepend(`<li id="${result.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${result.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${result.taskId}"><span>&times;</span></button></li>`);
+            createSortable(json.categoryId);
+          })
+          .catch(error => {
+            console.log(error);
+          })
+
+        }
+      })
+    }
+
+     $('#target-body').on('click', '.addTaskButton', function(event){
+       button = $(this);
+       categoryId = button.attr('data-category-id');
+       boardId = button.attr('data-board-id');
+     });
+
+     $('#btn-submitAddTaskPage').on('click', function(event){
+       $.ajax({
+         type: "POST",
+         url: `/board/${boardId}/category/${categoryId}/task`,
+         data: $('#addTask-form').serialize(),
+         dataType: "json",
+       })
+       .done(function(json){
+         if (json.err){
+           $('.addTaskModal-error-container').html(json.err);
+           $('.addTaskModal-error-container').css("display", "block");
+         }else{
+           //add task into list
+           $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
+
+           $('#addTaskModal').modal('hide');
+           $('#addTask-form')[0].reset();
+           updateOrder(json.categoryId);
+           createSortable(json.categoryId);
+         }
+       })
+     });
+
+     function createSortable(categoryId){
+       $(`#sortable${categoryId}`).sortable({
+         connectWith: ".connectedSortable",
+         receive: function(event, ui){
+           var taskArray = $(this).sortable('toArray');
+           console.log("Receive sortable ", taskArray);
+           updateOrder(categoryId);
+           console.log(ui.item["0"].id);
+           updateTaskTable(categoryId, ui.item["0"].id);
+         },
+         remove: function(event, ui){
+           var taskArray = $(this).sortable('toArray');
+           console.log("Remove sortable ", taskArray);
+           updateOrder(categoryId);
+         }
+       });
+     };
+
+     function updateTaskTable(newCategoryId, taskId){
+       $.ajax({
+         type: "PUT",
+         url: `/board/${boardId}/category/${newCategoryId}/task/${taskId}`
+       })
+       .done(function(result){
+
+       })
+     };
+
+     function updateOrder(categoryId){
+       var taskArray = [];
+       $(`#sortable${categoryId}>li`).each(function(){
+         // taskArray.push(parseInt($(this).attr('id')));
+         taskArray.push($(this).contents().get(0).nodeValue);
+       });
+       console.log("ARRAY ", taskArray);
+       $.ajax({
+         type: "POST",
+         url: `/board/${boardId}/category/${categoryId}/task/order`,
+         data: {array: taskArray}
+       })
+       .done(function(result){
+
+       })
+     };
+
+     $('#target-body').on('click', '.deleteTask', function(event){
+       button = $(this);
+       taskId = button.attr('data-task-id');
+       categoryId = button.parent().parent().attr('data-category-id');
+       $.ajax({
+         type: "DELETE",
+         url: `/board/${boardId}/category/${categoryId}/task/${taskId}`
+       })
+       .done(function(response){
+         button.parent().remove();
+         updateOrder(categoryId);
+       })
+     });
 
      function validateAddCategoryForm(){
        if ($.trim($('#addCategoryTitle-form input[name="categoryTitle"]').val()) == ""){
@@ -282,12 +352,12 @@
                        Delete
                      </button>
                    </div>
-                   <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text">+ Add New Tasks</a>
-                 </div>
-                 <ul  id="${json.categoryName}" class="list-group list-group-flush connectedSortable">
-                 </ul>
+                 <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="${json.boardId}" data-category-id="${json.categoryId}" class="card-text addTaskButton">+ Add New Tasks</a>
                </div>
-             </div>`);
+               <ul  id="sortable${json.categoryId}" class="list-group list-group-flush connectedSortable" data-category-id="${json.categoryId}">
+               </ul>
+             </div>
+           </div>`);
 
              $('#addCategoryModal').modal('hide');
              $('#addCategoryTitle-form')[0].reset();
@@ -335,7 +405,7 @@
            $(`#editButton${response.categoryId}`).replaceWith(`<button id="editButton${response.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${response.categoryId}" data-category-name="${response.categoryName}" data-board-id="${response.boardId}">
              Edit
            </button>`);
-
+           
             $('#editCategoryModal').modal('hide');
             $('#editCategoryTitle-form')[0].reset();
           }
@@ -347,16 +417,14 @@
        event.preventDefault();
        });
 
-       $('#target-body').on('click', '.editCategoryButton', function(event){
-         var button = $(this);
-         categoryId = button.attr('data-category-id');
-         categoryName = button.attr('data-category-name');
-         boardId = button.attr('data-board-id');
-         console.log("CATEGORY ID ", categoryId);
-         console.log("CATEGORY NAME ", categoryName);
-         $('.editCategoryModal-error-container').css("display", "none");
-         $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
-       });
+     $('#target-body').on('click', '.editCategoryButton', function(event){
+       var button = $(this);
+       categoryId = button.attr('data-category-id');
+       categoryName = button.attr('data-category-name');
+       boardId = button.attr('data-board-id');
+       $('.editCategoryModal-error-container').css("display", "none");
+       $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
+     });
 
   });
 </script>

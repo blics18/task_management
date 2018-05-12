@@ -15,6 +15,7 @@ module.exports = {
       //foreignKey
       userId:{
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
             model: 'taskUsers',
             key: 'id'
