@@ -25,13 +25,13 @@
         <div class="col-sm-3">
           <div class="card">
             <a href="/board/<%=boards[i].boardName%>/board-id/<%=boards[i].boardId%>" class="card-body">
-              <h5 id="<%=boards[i].boardId %>" class="card-title"><%= boards[i].boardName %></h5>
+              <h5 id="board<%=boards[i].boardId %>" class="card-title"><%= boards[i].boardName %></h5>
             </a>
             <div class="editBoardButtons">
             <button id="editButton<%= boards[i].boardId%>" type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="<%= boards[i].boardId %>" data-board-name="<%= boards[i].boardName %>">
               Edit
             </button>
-            <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="<%= boards[i].boardId %>">
+            <button id="deleteButton<%=boards[i].boardId%>" type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="<%= boards[i].boardId %>">
               Delete
             </button>
           </div>
@@ -40,7 +40,7 @@
       <% } %>
       <div class="col-sm-3">
         <div class="card">
-          <a href="#" data-toggle="modal" data-target="#addBoardModal" class="card-body">
+          <a id="createBoard" href="#" data-toggle="modal" data-target="#addBoardModal" class="card-body">
             <h5 class="card-title">Create new board</h5>
           </a>
         </div>
@@ -134,35 +134,58 @@
       var boardName;
       var button;
 
-      $('#btn-submitAddBoardPage').on('click', function(event){
-        $.ajax({
-          type: "POST",
-          url: "/home/board",
-          data: $('#addBoardTitle-form').serialize(),
-          dataType: "json",
-        })
-        .done(function(json){
-          if (json.err){
-            $('.addBoardModal-error-container').html(json.err);
-            $('.addBoardModal-error-container').css("display", "block");
-          }else{
-            $('.row').prepend(`<div class="col-sm-3">
-            <div class="card">
-              <a href="#" class="card-body">
-                <h5 id="${json.boardId}" class="card-title"> ${json.boardName}</h5>
-              </a>
-              <div class="editBoardButtons">
-                <button id="editButton${json.boardId}" type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${json.boardId}" data-board-name="${json.boardName}">Edit</button>
-                <button type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button>
-              </div>
-              </div>
-            </div>`);
+      function validateAddBoardForm(){
+        if ($.trim($('#addBoardTitle-form input[name="boardTitle"]').val()) == ""){
+          return false;
+        }
+        return true;
+      };
 
-            //add new board with title
-            $('#addBoardModal').modal('hide');
-            $('#addBoardTitle-form')[0].reset();
-          }
-        });
+      function validateEditBoardForm(){
+        if ($.trim($('#editBoardTitle-form input[name="boardTitle"]').val()) == ""){
+          return false;
+        }
+        return true;
+      };
+
+      $('#createBoard').on('click', function(event){
+        $('.addBoardModal-error-container').css("display", "none");
+      });
+
+      $('#btn-submitAddBoardPage').on('click', function(event){
+        if (validateAddBoardForm()){
+          $.ajax({
+            type: "POST",
+            url: "/home/board",
+            data: $('#addBoardTitle-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(json){
+            if (json.err){
+              $('.addBoardModal-error-container').html(json.err);
+              $('.addBoardModal-error-container').css("display", "block");
+            }else{
+              $('.row').prepend(`<div class="col-sm-3">
+              <div class="card">
+                <a id="${json.boardName}" href="/board/${json.boardName}/board-id/${json.boardId}" class="card-body">
+                  <h5 id="board${json.boardId}" class="card-title"> ${json.boardName}</h5>
+                </a>
+                <div class="editBoardButtons">
+                  <button id="editButton${json.boardId}" type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${json.boardId}" data-board-name="${json.boardName}">Edit</button>
+                  <button id="deleteButton${json.boardId}" type="button" class="btn btn-outline-danger deleteBoardButton" data-toggle="modal" data-target="#deleteBoardModal" data-board-id="${json.boardId}">Delete </button>
+                </div>
+                </div>
+              </div>`);
+
+              //add new board with title
+              $('#addBoardModal').modal('hide');
+              $('#addBoardTitle-form')[0].reset();
+            }
+          });
+        }else{
+          $('.addBoardModal-error-container').html("Please do not leave it empty");
+          $('.addBoardModal-error-container').css("display", "block");
+        }
         event.preventDefault();
       });
 
@@ -185,32 +208,39 @@
         var button = $(this);
         boardId = button.attr('data-board-id');
         boardName = button.attr('data-board-name');
+        $('.editBoardModal-error-container').css("display", "none");
         $("#editBoardModal [name='boardTitle']").attr("value", boardName);
       });
 
       $('#btn-submitEditBoardPage').on('click', function(event){
-        $.ajax({
-          type: "PUT",
-          url: `/home/board/${boardId}`,
-          data: $('#editBoardTitle-form').serialize(),
-          dataType: "json",
-        })
-        .done(function(response){
-          if (response.err){
-            $('.editBoardModal-error-container').html(response.err);
-            $('.editBoardModal-error-container').css("display", "block");
-          }else{
-            //edit board with new title
-            $(`#${response.boardId}`).replaceWith(`<h5 id="${response.boardId}" class="card-title"> ${response.boardName} </h5>`);
-            $(`#editButton${response.boardId}`).replaceWith(`<button id="editButton${response.boardId}" type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${response.boardId}" data-board-name="${response.boardName}">
-                 Edit
-               </button>`);
+        if(validateEditBoardForm()){
+          $.ajax({
+            type: "PUT",
+            url: `/home/board/${boardId}`,
+            data: $('#editBoardTitle-form').serialize(),
+            dataType: "json",
+          })
+          .done(function(response){
+            if (response.err){
+              $('.editBoardModal-error-container').html(response.err);
+              $('.editBoardModal-error-container').css("display", "block");
+            }else{
+              //edit board with new title
+              $(`#board${response.boardId}`).replaceWith(`<h5 id="board${response.boardId}" class="card-title"> ${response.boardName} </h5>`);
+              $(`#editButton${response.boardId}`).replaceWith(`<button id="editButton${response.boardId}" type="button" class="btn btn-outline-primary editBoardButton" data-toggle="modal" data-target="#editBoardModal" data-board-id="${response.boardId}" data-board-name="${response.boardName}">
+                   Edit
+                 </button>`);
 
-            $('#editBoardModal').modal('hide');
-            $('#editBoardTitle-form')[0].reset();
-          }
-        })
-      })
+              $('#editBoardModal').modal('hide');
+              $('#editBoardTitle-form')[0].reset();
+            }
+          })
+        }else{
+          $('.editBoardModal-error-container').html("Please do not leave it empty");
+          $('.editBoardModal-error-container').css("display", "block");
+        }
+        event.preventDefault();
+      });
     });
   </script>
 <% include footer %>
