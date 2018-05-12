@@ -41,77 +41,11 @@
           <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
         <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable" data-category-id="<%= categories[i].categoryId %>">
-            <i class="fa fa-spinner fa-spin" id="loadIcon<%=categories[i].categoryId %>"></i>
+            <!-- <i class="fa fa-spinner fa-spin" id="loadIcon<%=categories[i].categoryId %>"></i> -->
         </ul>
       </div>
     </div>
   <% } %>
-  <!-- <div class="column">
-    <div class="card categoryCard" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title cardTask">Front-End</h5>
-          <div class="editBoardButtons">
-          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
-            Edit
-          </button>
-          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
-            Delete
-          </button>
-        </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text addTaskButton">+ Add New Tasks</a>
-      </div>
-      <ul  id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Front-End">
-        <li id=1 class="list-group-item ui-state-default" data-category-name="Front-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li id=2 class="list-group-item ui-state-default" data-category-name="Front-End">Dapibus ac facilisis in
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li id=3 class="list-group-item ui-state-default" data-category-name="Front-End">Vestibulum at eros
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="column">
-    <div class="card categoryCard" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title cardTask">Back-End</h5>
-          <div class="editBoardButtons">
-          <button type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal">
-            Edit
-          </button>
-          <button type="button" class="btn btn-outline-danger deleteCategoryButton" data-toggle="modal" data-target="#deleteCategoryModal">
-            Delete
-          </button>
-          </div>
-        <a href="#" data-toggle="modal" data-target="#addTaskModal" class="card-text addTaskButton">+ Add New Tasks</a>
-      </div>
-      <ul id="sortable1" class="list-group list-group-flush connectedSortable" data-category-name="Back-End">
-        <li id=1 class="list-group-item ui-state-default" data-category-name="Back-End">Cras justo odio blah blah blah blah bhalfaiejfaiwjef
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li id=2 class="list-group-item ui-state-default" data-category-name="Back-End">Dapibus ac facilisis in
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-        <li id=3 class="list-group-item ui-state-default" data-category-name="Back-End">Vestibulum at eros
-          <button type="button" class="close deleteTask" aria-label="Close">
-            <span>&times;</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div> -->
 
   <div class="column">
       <div class="card" style="width: 18rem;">
@@ -240,29 +174,53 @@
 
     $.ajax({
       type: "GET",
-      url: `/board/${boardId}/task/load`,
-      datatype: "json"
-    })
-    .done(function(json){
-      console.log(json);
-      // for (i = 0; i < json.length; i++){
-        //   $(`#loadIcon${categoryId}`).css('display', 'none');
-        // $(`#sortable${json[i].categoryId}`).prepend(`<li id="${json[i].taskId}" class="list-group-item ui-state-default" data-category-id="${json[i].categoryId}">
-        // ${json[i].taskName}
-        //   <button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json[i].taskId}">
-        //     <span>&times;</span>
-        //   </button>
-        // </li>`);
-    })
+      url: `/board/${boardId}/categories`,
+      dataType: "json"
+      })
+      .done(function(json){
+        for (i = 0;i < json.length; i++){
+          loadTasks(json[i].categoryId);
+        }
+      });
 
-    //sortable[taskId]
-     // $( "#sortable1, #sortable2" ).sortable({
-     //   connectWith: ".connectedSortable",
-     //   update: function( event, ui ) {
-     //     console.log($(this).attr('data-category-name'));
-     //     var result = $(this).sortable('toArray');
-     //   }
-     // }).disableSelection();
+    function getTaskId(categoryId, taskName){
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          type: "GET",
+          url: `/board/${boardId}/category/${categoryId}/task/${taskName}`,
+          dataType: "json"
+        })
+        .done(function(json){
+          resolve({taskId: json.taskId, taskName: json.taskName});
+        })
+        .error(function(err){
+          reject(err);
+        })
+    })
+  }
+
+    function loadTasks(categoryId){
+      $.ajax({
+        type: "GET",
+        url: `/board/${boardId}/category/${categoryId}/task/load`,
+        dataType: "json"
+      })
+      .done(function(json){
+        for (i = 0; i < json.taskArray.length; i++){
+          var taskIdPromise = getTaskId(json.categoryId, json.taskArray[i]);
+          taskIdPromise.then(result => {
+            console.log("TASK ", result);
+              // $(`#loadIcon${categoryId}`).css('display', 'none');
+            $(`#sortable${json.categoryId}`).prepend(`<li id="${result.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${result.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${result.taskId}"><span>&times;</span></button></li>`);
+            createSortable(json.categoryId);
+          })
+          .catch(error => {
+            console.log(error);
+          })
+
+        }
+      })
+    }
 
      $('#target-body').on('click', '.addTaskButton', function(event){
        button = $(this);
@@ -283,12 +241,7 @@
            $('.addTaskModal-error-container').css("display", "block");
          }else{
            //add task into list
-           $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">
-           ${json.taskName}
-             <button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}">
-               <span>&times;</span>
-             </button>
-           </li>`);
+           $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
 
            $('#addTaskModal').modal('hide');
            $('#addTask-form')[0].reset();
@@ -329,8 +282,10 @@
      function updateOrder(categoryId){
        var taskArray = [];
        $(`#sortable${categoryId}>li`).each(function(){
-         taskArray.push(parseInt($(this).attr('id')));
+         // taskArray.push(parseInt($(this).attr('id')));
+         taskArray.push($(this).contents().get(0).nodeValue);
        });
+       console.log("ARRAY ", taskArray);
        $.ajax({
          type: "POST",
          url: `/board/${boardId}/category/${categoryId}/task/order`,

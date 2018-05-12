@@ -5,13 +5,10 @@ var router = express.Router();
 
 router.use(auth.requireLogin);
 
-var categoryId;
-
 router.get('/:boardName/board-id/:boardId', function(req, res, next) {
   //load user's categories
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(categories){
-    categoryId = categories;
     res.render('board', {
       categories: categories,
       boardName: req.params.boardName,
@@ -24,99 +21,40 @@ router.get('/:boardName/board-id/:boardId', function(req, res, next) {
   })
 });
 
-//TODO ISSUE
-// function queryTask(taskArray, res){
-//   var tasks = [];
-//   for (i = 0; i < taskArray.length; i++){
-//       promise = new Promise((resolve, reject) => {
-//
-//       db.sequelize.query('SELECT * FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: taskArray[i]}, type: db.sequelize.QueryTypes.SELECT})
-//       .then(function(task){
-//         // tasks.push(task[0]);
-//         resolve(task[0]);
-//       })
-//       .catch(function(err){
-//         reject(err);
-//         res.status(500).send(err);
-//         return console.error(err);
-//       })
-//     })
-//     tasks.push(promise);
-//   }
-//
-//
-//     Promise.all(tasks).then(function(tasks){
-//       console.log("RESOLVE HERE ", tasks);
-//       return new Promise((resolve, reject) => {
-//         resolve(tasks);
-//     })
-//   })
-// }
-
-function queryTask(taskArray, res){
-  var tasks = [];
-
-  return new Promise((resolve, reject) => {
-    for (i = 0; i < taskArray.length; i++){
-      db.sequelize.query('SELECT * FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: taskArray[i]}, type: db.sequelize.QueryTypes.SELECT})
-      .then(function(task){
-        // tasks.push(task[0]);
-        resolve(task[0]);
-      })
-      .catch(function(err){
-        reject(err);
-        res.status(500).send(err);
-        return console.error(err);
-      })
-    }
+//get all categories for a board
+router.get('/:boardId/categories', function(req, res){
+  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    res.json(result)
   })
-}
-
-//TODO ISSUE
-function queryTaskOrder(res){
-  var taskMap = new Map();
-  return new Promise((resolve, reject) => {
-    for (i = 0; i < categoryId.length; i++){
-      db.sequelize.query('SELECT "taskArray" FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: categoryId[i].categoryId}, type: db.sequelize.QueryTypes.SELECT})
-      .then(function(taskArray){
-        console.log("taskArray ------> ", taskArray);
-        const taskPromise = queryTask(taskArray[0].taskArray, res);
-        taskPromise.then(task =>{
-            // if (taskMap.get(task.categoryId)){
-            //   taskMap.get(task.categoryId).push(task.task);
-            //   console.log("TASKMAP HERE ----> ", taskMap);
-            // }else{
-            //   var tasks = [];
-            //   tasks.push(task);
-            //   taskMap.set(task.categoryId, tasks);
-            //   console.log("TASKMAP ----> ", taskMap);
-            // }
-            taskMap.set(task.categoryId, task);
-            console.log("TASKMAP ----> ", taskMap);
-        })
-        .catch(err =>{
-          console.log(err);
-        })
-      })
-      .catch(function(err){
-        reject(err);
-        res.status(500).send(err);
-        return console.error(err);
-      })
-    }
-    resolve(taskMap);
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
   })
-}
+});
 
-//TODO ISSUE
-router.get('/:boardId/task/load', function(req, res){
-    const taskOrderPromise = queryTaskOrder(res);
-    taskOrderPromise.then(taskMap =>{
-      res.json(taskMap);
-    })
-    .catch(err => {
-      console.log(err);
-    })
+//get order of lists
+router.get('/:boardId/category/:categoryId/task/load', function(req, res){
+  db.sequelize.query('SELECT * FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    res.json(result[0])
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
+});
+
+//get taskID
+router.get('/:boardId/category/:categoryId/task/:taskName', function(req, res){
+  db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"=:taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.params.taskName}, type: db.sequelize.QueryTypes.SELECT})
+  .then(function(result){
+    res.json(result[0]);
+  })
+  .catch(function(err){
+    res.status(500).send(err);
+    return console.error(err);
+  })
 });
 
 //add category
@@ -263,7 +201,7 @@ router.post('/:boardId/category/:categoryId/task/order', function(req, res){
   db.sequelize.query('SELECT * FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){
-      db.sequelize.query('INSERT INTO "taskOrders" ("categoryId", "taskArray") VALUES (:categoryId, ARRAY[:taskArray])', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array.map(Number)}, type: db.sequelize.QueryTypes.INSERT})
+      db.sequelize.query('INSERT INTO "taskOrders" ("categoryId", "taskArray") VALUES (:categoryId, ARRAY[:taskArray])', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.INSERT})
       .then(function(arrayResult){
         res.end();
       })
@@ -272,7 +210,7 @@ router.post('/:boardId/category/:categoryId/task/order', function(req, res){
         return console.error(err);
       })
     }else{
-      db.sequelize.query('UPDATE "taskOrders" SET "taskArray"=ARRAY[:taskArray] WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array.map(Number)}, type: db.sequelize.QueryTypes.UDPATE})
+      db.sequelize.query('UPDATE "taskOrders" SET "taskArray"=ARRAY[:taskArray] WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId, taskArray: req.body.array}, type: db.sequelize.QueryTypes.UDPATE})
       .then(function(arrayResult){
         res.end();
       })
