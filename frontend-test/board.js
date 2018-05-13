@@ -16,7 +16,7 @@ const accUser = Role('localhost:3000/auth', async t => {
       .click(Selector('#board1'))
 }, { preserveUrl: true });
 
-fixture.only `Board Page`// declare the fixture
+fixture `Board Page`// declare the fixture
     .page `localhost:3000/board/TestCafe%20Board/board-id/1`  // specify the start page
     .beforeEach(async t => {
     		await t
@@ -30,6 +30,8 @@ const addCategorySubmitButton = Selector('#btn-submitAddCategoryPage');
 const editCategoryModal = Selector('#editCategoryModal');
 const editCategoryFormInput = Selector('#editCategoryTitle-form input[name="categoryTitle"]');
 const editCategorySubmitButton = Selector('#btn-submitEditCategoryPage');
+const addTaskFormInput = Selector('#addTask-form input[name="taskDescription"]');
+const addTaskSubmitButton = Selector('#btn-submitAddTaskPage');
 
 test('User adds a new category', async t => {
     await t
@@ -138,6 +140,97 @@ test('User cancels editing category title', async t => {
         .expect(Selector('#categoryId1').innerText).eql("Cafe");
 });
 
+//add new task with spaces
+test('User enters spaces as a new task', async t => {
+  await t
+    .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
+    .click(Selector('#addTaskButton1'))
+    .expect(Selector('#addTaskModal').visible).ok()
+    .expect(Selector('.addTaskModal-error-container').visible).notOk()
+    .click(addTaskFormInput)
+    .typeText(addTaskFormInput, "        ")
+    .click(addTaskSubmitButton)
+    .expect(Selector('.addTaskModal-error-container').visible).ok()
+    .expect(Selector('.addTaskModal-error-container').innerText).eql("Please do not leave it empty")
+});
+
+//add new task
+test('User adds a new task under a category', async t => {
+    await t
+      .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
+      .click(Selector('#addTaskButton1'))
+      .expect(Selector('#addTaskModal').visible).ok()
+      .expect(Selector('.addTaskModal-error-container').visible).notOk()
+      .click(addTaskFormInput)
+      .typeText(addTaskFormInput, "Cafe Task 1")
+      .click(addTaskSubmitButton)
+      .expect(Selector('#addTaskModal').visible).notOk()
+      .expect(Selector('#sortable1 #task1').visible).ok();
+});
+
+//cancel add task
+test('User cancels adding a task', async t => {
+    await t
+      .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
+      .click(Selector('#addTaskButton1'))
+      .expect(Selector('#addTaskModal').visible).ok()
+      .expect(Selector('.addTaskModal-error-container').visible).notOk()
+      .click(Selector('#btn-cancelAddTaskPage'))
+      .expect(Selector('#addTaskModal').visible).notOk();
+});
+
+//drag task to a different category
+test('User drags a task to a different category', async t => {
+    await t
+      .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
+      .click(addCategoryButton)
+      .expect(addCategoryModal.visible).ok()
+      .click(addCategoryFormInput)
+      .typeText(addCategoryFormInput, "Coffee")
+      .click(addCategorySubmitButton)
+      .expect(addCategoryModal.visible).notOk()
+      .expect(Selector('#categoryId2').innerText).eql("Coffee")
+
+      .click(Selector('#addTaskButton1'))
+      .expect(Selector('#addTaskModal').visible).ok()
+      .expect(Selector('.addTaskModal-error-container').visible).notOk()
+      .click(addTaskFormInput)
+      .typeText(addTaskFormInput, "Cafe Task 2")
+      .click(addTaskSubmitButton)
+      .expect(Selector('#addTaskModal').visible).notOk()
+      .expect(Selector('#sortable1 #task2').visible).ok()
+
+      .click(Selector('#addTaskButton2'))
+      .expect(Selector('#addTaskModal').visible).ok()
+      .expect(Selector('.addTaskModal-error-container').visible).notOk()
+      .click(addTaskFormInput)
+      .typeText(addTaskFormInput, "Coffee Task 1")
+      .click(addTaskSubmitButton)
+      .expect(Selector('#addTaskModal').visible).notOk()
+      .expect(Selector('#sortable2 #task3').visible).ok()
+
+      .click(Selector('#addTaskButton2'))
+      .expect(Selector('#addTaskModal').visible).ok()
+      .expect(Selector('.addTaskModal-error-container').visible).notOk()
+      .click(addTaskFormInput)
+      .typeText(addTaskFormInput, "Coffee Task 2")
+      .click(addTaskSubmitButton)
+      .expect(Selector('#addTaskModal').visible).notOk()
+      .expect(Selector('#sortable2 #task4').visible).ok()
+
+      .dragToElement('#sortable1 #task2', '#sortable2')
+      .expect(Selector('#sortable2 .list-group-item').count).eql(3)
+      .expect(Selector('#sortable1 .list-group-item').count).eql(1);
+});
+
+//delete task
+test('User deletes a task under a category', async t => {
+    await t
+      .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
+      .click(Selector('#sortable1 #deleteTask1'))
+      .expect(Selector('#sortable1 #task1').exits).notOk();
+})
+
 //delete category
 test('User deletes category', async t => {
     await t
@@ -145,12 +238,9 @@ test('User deletes category', async t => {
         .click(Selector('#deleteButton1'))
         .expect(Selector('#deleteCategoryModal').visible).ok()
         .click(Selector('#btn-deleteCategory'))
-        .expect(Selector('#categoryId1').exists).notOk();
+        .expect(Selector('#categoryId1').exists).notOk()
+        .expect(Selector('#categoryId2').exists).ok();
 });
-
-//TODO add new task
-//TODO delete task
-//TODO drag task to a different category
 
 //test home
 test('User goes back to home page', async t =>{
