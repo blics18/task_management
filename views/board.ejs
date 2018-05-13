@@ -38,7 +38,7 @@
               Delete
             </button>
           </div>
-          <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
+          <a id="addTaskButton<%= categories[i].categoryId %>" href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="<%= boardId %>" data-category-id="<%= categories[i].categoryId %>" class="card-text addTaskButton">+ Add New Tasks</a>
         </div>
         <ul  id="sortable<%= categories[i].categoryId %>" class="list-group list-group-flush connectedSortable" data-category-id="<%= categories[i].categoryId %>">
             <!-- <i class="fa fa-spinner fa-spin" id="loadIcon<%=categories[i].categoryId %>"></i> -->
@@ -172,6 +172,7 @@
     var boardId = $('.boardId').attr('data-board-id');
     var button;
 
+    //load tasks
     $.ajax({
       type: "GET",
       url: `/board/${boardId}/categories`,
@@ -211,7 +212,7 @@
           taskIdPromise.then(result => {
             console.log("TASK ", result);
               // $(`#loadIcon${categoryId}`).css('display', 'none');
-            $(`#sortable${json.categoryId}`).prepend(`<li id="${result.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${result.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${result.taskId}"><span>&times;</span></button></li>`);
+            $(`#sortable${json.categoryId}`).prepend(`<li id="${result.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${result.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${result.taskId}"><span id="deleteTask${result.taskId}">&times;</span></button></li>`);
             createSortable(json.categoryId);
           })
           .catch(error => {
@@ -222,6 +223,13 @@
       })
     }
 
+    function validateAddTaskForm(){
+      if ($.trim($('#addTask-form input[name="taskDescription"]').val()) == ""){
+        return false;
+      }
+      return true;
+    }
+
      $('#target-body').on('click', '.addTaskButton', function(event){
        button = $(this);
        categoryId = button.attr('data-category-id');
@@ -229,26 +237,32 @@
      });
 
      $('#btn-submitAddTaskPage').on('click', function(event){
-       $.ajax({
-         type: "POST",
-         url: `/board/${boardId}/category/${categoryId}/task`,
-         data: $('#addTask-form').serialize(),
-         dataType: "json",
-       })
-       .done(function(json){
-         if (json.err){
-           $('.addTaskModal-error-container').html(json.err);
-           $('.addTaskModal-error-container').css("display", "block");
-         }else{
-           //add task into list
-           $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
+       if (validateAddTaskForm()){
+         $.ajax({
+           type: "POST",
+           url: `/board/${boardId}/category/${categoryId}/task`,
+           data: $('#addTask-form').serialize(),
+           dataType: "json",
+         })
+         .done(function(json){
+           if (json.err){
+             $('.addTaskModal-error-container').html(json.err);
+             $('.addTaskModal-error-container').css("display", "block");
+           }else{
+             //add task into list
+             $(`#sortable${json.categoryId}`).prepend(`<li id="task${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
 
-           $('#addTaskModal').modal('hide');
-           $('#addTask-form')[0].reset();
-           updateOrder(json.categoryId);
-           createSortable(json.categoryId);
-         }
-       })
+             $('#addTaskModal').modal('hide');
+             $('#addTask-form')[0].reset();
+             updateOrder(json.categoryId);
+             createSortable(json.categoryId);
+           }
+         })
+       }else{
+         $('.addTaskModal-error-container').html("Please do not leave it empty");
+         $('.addTaskModal-error-container').css("display", "block");
+       }
+       event.preventDefault();
      });
 
      function createSortable(categoryId){
@@ -317,13 +331,6 @@
        return true;
      }
 
-     function validateEditCategoryForm(){
-       if ($.trim($('#editCategoryTitle-form input[name="categoryTitle"]').val()) == ""){
-         return false;
-       }
-       return true;
-     }
-
      $('#btn-submitAddCategoryPage').on('click', function(event){
        var button = $(this);
        var boardId = button.attr('data-board-id');
@@ -352,7 +359,7 @@
                        Delete
                      </button>
                    </div>
-                 <a href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="${json.boardId}" data-category-id="${json.categoryId}" class="card-text addTaskButton">+ Add New Tasks</a>
+                 <a id="addTaskButton${json.categoryId}" href="#" data-toggle="modal" data-target="#addTaskModal" data-board-id="${json.boardId}" data-category-id="${json.categoryId}" class="card-text addTaskButton">+ Add New Tasks</a>
                </div>
                <ul  id="sortable${json.categoryId}" class="list-group list-group-flush connectedSortable" data-category-id="${json.categoryId}">
                </ul>
@@ -386,6 +393,22 @@
        });
      });
 
+     function validateEditCategoryForm(){
+       if ($.trim($('#editCategoryTitle-form input[name="categoryTitle"]').val()) == ""){
+         return false;
+       }
+       return true;
+     }
+
+     $('#target-body').on('click', '.editCategoryButton', function(event){
+       var button = $(this);
+       categoryId = button.attr('data-category-id');
+       categoryName = button.attr('data-category-name');
+       boardId = button.attr('data-board-id');
+       $('.editCategoryModal-error-container').css("display", "none");
+       $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
+     });
+
     $('#btn-submitEditCategoryPage').on('click', function(event){
       if(validateEditCategoryForm()){
         $.ajax({
@@ -405,7 +428,7 @@
            $(`#editButton${response.categoryId}`).replaceWith(`<button id="editButton${response.categoryId}" type="button" class="btn btn-outline-primary editCategoryButton" data-toggle="modal" data-target="#editCategoryModal" data-category-id="${response.categoryId}" data-category-name="${response.categoryName}" data-board-id="${response.boardId}">
              Edit
            </button>`);
-           
+
             $('#editCategoryModal').modal('hide');
             $('#editCategoryTitle-form')[0].reset();
           }
@@ -417,14 +440,6 @@
        event.preventDefault();
        });
 
-     $('#target-body').on('click', '.editCategoryButton', function(event){
-       var button = $(this);
-       categoryId = button.attr('data-category-id');
-       categoryName = button.attr('data-category-name');
-       boardId = button.attr('data-board-id');
-       $('.editCategoryModal-error-container').css("display", "none");
-       $("#editCategoryModal [name='categoryTitle']").attr("value", categoryName);
-     });
 
   });
 </script>
