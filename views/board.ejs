@@ -250,7 +250,7 @@
              $('.addTaskModal-error-container').css("display", "block");
            }else{
              //add task into list
-             $(`#sortable${json.categoryId}`).prepend(`<li id="task${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
+             $(`#sortable${json.categoryId}`).prepend(`<li id="${json.taskId}" class="list-group-item ui-state-default" data-category-id="${json.categoryId}">${json.taskName}<button type="button" class="close deleteTask" aria-label="Close" data-task-id="${json.taskId}"><span>&times;</span></button></li>`);
 
              $('#addTaskModal').modal('hide');
              $('#addTask-form')[0].reset();

@@ -165,7 +165,7 @@ test('User adds a new task under a category', async t => {
       .typeText(addTaskFormInput, "Cafe Task 1")
       .click(addTaskSubmitButton)
       .expect(Selector('#addTaskModal').visible).notOk()
-      .expect(Selector('#sortable1 #task1').visible).ok();
+      .expect(Selector('#sortable1 #1').visible).ok();
 });
 
 //cancel add task
@@ -198,7 +198,7 @@ test('User drags a task to a different category', async t => {
       .typeText(addTaskFormInput, "Cafe Task 2")
       .click(addTaskSubmitButton)
       .expect(Selector('#addTaskModal').visible).notOk()
-      .expect(Selector('#sortable1 #task2').visible).ok()
+      .expect(Selector('#sortable1 #2').visible).ok()
 
       .click(Selector('#addTaskButton2'))
       .expect(Selector('#addTaskModal').visible).ok()
@@ -207,7 +207,7 @@ test('User drags a task to a different category', async t => {
       .typeText(addTaskFormInput, "Coffee Task 1")
       .click(addTaskSubmitButton)
       .expect(Selector('#addTaskModal').visible).notOk()
-      .expect(Selector('#sortable2 #task3').visible).ok()
+      .expect(Selector('#sortable2 #3').visible).ok()
 
       .click(Selector('#addTaskButton2'))
       .expect(Selector('#addTaskModal').visible).ok()
@@ -216,9 +216,9 @@ test('User drags a task to a different category', async t => {
       .typeText(addTaskFormInput, "Coffee Task 2")
       .click(addTaskSubmitButton)
       .expect(Selector('#addTaskModal').visible).notOk()
-      .expect(Selector('#sortable2 #task4').visible).ok()
+      .expect(Selector('#sortable2 #4').visible).ok()
 
-      .dragToElement('#sortable1 #task2', '#sortable2')
+      .dragToElement('#sortable1 #2', '#sortable2')
       .expect(Selector('#sortable2 .list-group-item').count).eql(3)
       .expect(Selector('#sortable1 .list-group-item').count).eql(1);
 });
@@ -228,7 +228,7 @@ test('User deletes a task under a category', async t => {
     await t
       .expect(Selector('#boardPageName').innerText).eql('TestCafe Board')
       .click(Selector('#sortable1 #deleteTask1'))
-      .expect(Selector('#sortable1 #task1').exits).notOk();
+      .expect(Selector('#sortable1 #1').exits).notOk();
 })
 
 //delete category
