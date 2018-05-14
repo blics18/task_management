@@ -15,17 +15,17 @@ router.get('/:boardName/board-id/:boardId', function(req, res, next) {
       boardId: req.params.boardId
     });
   })
-  .catch(function(err){
-    res.status(500).send(err);
-    return console.error(err);
-  })
+    .catch(function(err){
+      res.status(500).send(err);
+      return console.error(err);
+    });
 });
 
 //get all categories for a board
 router.get('/:boardId/categories', function(req, res){
   db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId', {replacements: {boardId: req.params.boardId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
-    res.json(result)
+      res.json(result);
   })
   .catch(function(err){
     res.status(500).send(err);
@@ -37,7 +37,7 @@ router.get('/:boardId/categories', function(req, res){
 router.get('/:boardId/category/:categoryId/task/load', function(req, res){
   db.sequelize.query('SELECT * FROM "taskOrders" WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
-    res.json(result[0])
+    res.json(result[0]);
   })
   .catch(function(err){
     res.status(500).send(err);
@@ -49,7 +49,7 @@ router.get('/:boardId/category/:categoryId/task/load', function(req, res){
 router.get('/:boardId/category/:categoryId/task/:taskName', function(req, res){
   db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"=:taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.params.taskName}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
-    res.json(result[0]);
+      res.json(result[0]);
   })
   .catch(function(err){
     res.status(500).send(err);
@@ -59,7 +59,7 @@ router.get('/:boardId/category/:categoryId/task/:taskName', function(req, res){
 
 //add category
 router.post('/:boardId/category', function(req, res){
-  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
+  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"=:categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate category name in a board
       db.sequelize.query('INSERT INTO categories ("categoryName", "boardId") VALUES (:categoryName, :boardId)', {replacements: {categoryName: req.body.categoryTitle.trim(), boardId: req.params.boardId }, type: db.sequelize.QueryTypes.INSERT})
@@ -67,7 +67,7 @@ router.post('/:boardId/category', function(req, res){
         if (categoryResult[1]){
           db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(category){
-            res.send(JSON.stringify(category[0]));
+            res.json(category[0]);
           })
           .catch(function(err){
             res.status(500).send(err);
@@ -83,10 +83,7 @@ router.post('/:boardId/category', function(req, res){
         return console.error(err);
       })
     }else{
-      err = {
-          err: `Category Name (${req.body.categoryTitle.trim()}) already exists. Enter another`
-      }
-      res.send(JSON.stringify(err));
+      res.json({err: `Category Name (${req.body.categoryTitle.trim()}) already exists. Enter another`});
     }
   })
   .catch(function(err){
@@ -99,7 +96,7 @@ router.post('/:boardId/category', function(req, res){
 router.delete('/:boardId/category/:categoryId', function(req, res){
   db.sequelize.query('DELETE FROM categories WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.DELETE})
   .then(function(result){
-    res.end();
+      res.end();
   })
   .catch(function(err){
     res.status(500).send(err);
@@ -109,7 +106,7 @@ router.delete('/:boardId/category/:categoryId', function(req, res){
 
 //update category title
 router.put('/:boardId/category/:categoryId', function(req, res){
-  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"= :categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
+  db.sequelize.query('SELECT * FROM categories WHERE "boardId"=:boardId AND "categoryName"=:categoryName', {replacements: {boardId: req.params.boardId, categoryName: req.body.categoryTitle.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate category name for one user
       db.sequelize.query('UPDATE categories SET "categoryName"=:categoryName WHERE "categoryId"=:categoryId', {replacements: {categoryName: req.body.categoryTitle.trim(), categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.UPDATE})
@@ -117,7 +114,7 @@ router.put('/:boardId/category/:categoryId', function(req, res){
         if (updateResult[1]){
           db.sequelize.query('SELECT * FROM categories WHERE "categoryId"=:categoryId', {replacements: {categoryId: req.params.categoryId}, type: db.sequelize.QueryTypes.SELECT})
           .then(function(newTitle){
-            res.send(JSON.stringify(newTitle[0]));
+            res.json(newTitle[0]);
           })
           .catch(function(err){
             res.status(500).send(err);
@@ -130,10 +127,7 @@ router.put('/:boardId/category/:categoryId', function(req, res){
         return console.error(err);
       })
     }else{
-      err = {
-        err: `Category Name (${req.body.categoryTitle.trim()}) already exists. Enter another`
-      }
-      res.send(JSON.stringify(err));
+      res.json({err: `Category Name (${req.body.categoryTitle.trim()}) already exists. Enter another`});
     }
   })
   .catch(function(err){
@@ -144,7 +138,7 @@ router.put('/:boardId/category/:categoryId', function(req, res){
 
 //add task to a category
 router.post('/:boardId/category/:categoryId/task', function(req, res){
-  db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"= :taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
+  db.sequelize.query('SELECT * FROM tasks WHERE "categoryId"=:categoryId AND "taskName"=:taskName', {replacements: {categoryId: req.params.categoryId, taskName: req.body.taskDescription.trim()}, type: db.sequelize.QueryTypes.SELECT})
   .then(function(result){
     if (result.length == 0){ //no duplicate task for one user
       db.sequelize.query('INSERT INTO tasks ("taskName", "categoryId") VALUES (:taskName, :categoryId)', {replacements: {taskName: req.body.taskDescription.trim(), categoryId: req.params.categoryId }, type: db.sequelize.QueryTypes.INSERT})
@@ -176,7 +170,7 @@ router.post('/:boardId/category/:categoryId/task', function(req, res){
 router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
   db.sequelize.query('DELETE FROM tasks WHERE "taskId"=:taskId', {replacements: {taskId: req.params.taskId}, type: db.sequelize.QueryTypes.DELETE})
   .then(function(result){
-    res.end();
+      res.end();
   })
   .catch(function(err){
     res.status(500).send(err);
@@ -188,12 +182,12 @@ router.delete('/:boardId/category/:categoryId/task/:taskId', function(req, res){
 router.put('/:boardId/category/:categoryId/task/:taskId', function(req, res){
   db.sequelize.query('UPDATE tasks SET "categoryId"=:categoryId WHERE "taskId"=:taskId', {replacements: {categoryId: req.params.categoryId, taskId: req.params.taskId}, type: db.sequelize.QueryTypes.UPDATE})
   .then(function(result){
-    res.end();
+      res.end();
   })
   .catch(function(err){
     res.status(500).send(err);
     return console.error(err);
-  })
+  });
 });
 
 //insert list of task ids to keep order

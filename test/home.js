@@ -19,7 +19,7 @@ describe("Testing for boards on Home Page", function(){
     .end(function (error, response) {
       response.should.have.status(200);
       expect('Location', '/home');
-      db.sequelize.query('INSERT INTO boards ("boardId", "boardName", "userId") VALUES (:boardId, :boardName, :userId)', { replacements: {boardId: 1, boardName: 'Copy Board', userId: 1}, type: db.sequelize.QueryTypes.INSERT})
+      db.sequelize.query('INSERT INTO boards ("boardName", "userId") VALUES (:boardName, :userId)', { replacements: { boardName: 'Copy Board', userId: 1}, type: db.sequelize.QueryTypes.INSERT})
       .then(function(boardResult){
       })
       .catch(function(error){
@@ -40,7 +40,7 @@ describe("Testing for boards on Home Page", function(){
   });
 
 
-  //TODO load boards when first enter home page
+  //load boards when first enter home page
   it('should successfully GET and return boards in database', function(done){
     agent
       .get('/home')
@@ -49,6 +49,7 @@ describe("Testing for boards on Home Page", function(){
       })
       .end(function(error, response){
         response.should.have.status(200);
+        response.should.be.html;
         done();
       })
   })
@@ -92,7 +93,7 @@ describe("Testing for boards on Home Page", function(){
 
 
     //update board Title
-    it('should successfully POST and return new board title', function(done){
+    it('should successfully PUT and return new board title', function(done){
       agent
         .put('/home/board/1')
         .send({
@@ -114,7 +115,7 @@ describe("Testing for boards on Home Page", function(){
     });
 
     //update board title with duplicate title
-    it('should fail to POST and return error message (board already exists)', function(done){
+    it('should fail to PUT and return error message (board already exists)', function(done){
       agent
         .put('/home/board/1')
         .send({
